@@ -1,0 +1,17 @@
+[master]
+user root
+host 128.199.170.128 128.199.244.193
+path /var/www/html
+forward-agent yes
+pre-rsync ./bin/pre-rsync
+post-deploy touch dummy
+
+[develop]
+host root@128.199.170.128 john@128.199.170.128
+path /var/www/html
+forward-agent yes
+post-deploy /var/www/myapp.com/update.sh
+
+[webhook]
+user root
+host 128.199.132.104

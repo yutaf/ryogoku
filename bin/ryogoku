@@ -1,0 +1,318 @@
+#!/usr/bin/env bash
+
+VERSION="0.0.1"
+CONFIG=./ryogoku.conf
+REF=
+ENV=
+TMP=
+EXCLUDE_FILE=./rsync-exclude
+DRYRUN=0
+FORCE=0
+PARALLEL=10
+NEEDS_TTY=0
+
+RED=31
+GREEN=32
+YELLOW=33
+BLUE=34
+
+#
+# Output usage information.
+#
+usage() {
+  cat <<-EOF
+
+  Usage: ryogoku [options] [command]
+
+  Options:
+
+    -V, --version        output program versions
+    -h, --help           output help information
+    -n, --dry-run        show what would have been transferred
+    -f, --force          force deploy even if commit or push are undone
+    -P <n>               Set max number of parallel execution. default: $PARALLEL
+    -E <ENV>             Set config section to use
+
+  Commands:
+
+    revert [n]           revert to [n]th last deployment or 1
+    list                 list previous deploy commits
+    enable_webhook_ssh   Add webhook public key to deployment host(s)
+    [ref]                deploy to [ref], the 'ref' setting, or latest tag
+
+EOF
+}
+
+#
+# Abort with <msg>.
+#
+abort() {
+  test -d "$TMP" && rm -rf $TMP
+  echo
+  cecho $RED "  $@" 1>&2
+  echo
+  exit 1
+}
+
+#
+# echo with <color>.
+#
+cecho() {
+    color=$1
+    shift
+    echo -e "\033[${color}m$@\033[m"
+}
+
+#
+# Log <msg>.
+#
+log() {
+  cecho $YELLOW "  ○ $@"
+}
+
+#
+# Warn <msg>.
+#
+warn() {
+  cecho $RED "  ○ $@"
+}
+
+#
+# Check if config <section> exists.
+#
+config_section() {
+  grep "^\[$1" $CONFIG &> /dev/null
+}
+
+#
+# Get config value by <key>.
+#
+config_get() {
+  local nr_env=$(awk "/^\[$ENV/ { print NR }" $CONFIG)
+  local nr_next_env=$(awk "NR > $nr_env && /^\[/ { print NR; exit }" $CONFIG)
+  test -z "$nr_next_env" && nr_next_env='$'
+
+  local key=$1
+  test -n "$key" \
+    && sed -n "${nr_env}, ${nr_next_env}p" $CONFIG \
+    | grep "^$key" \
+    | head -n 1 \
+    | cut -d ' ' -f 2-
+}
+
+#
+# Output version.
+#
+version() {
+  echo $VERSION
+}
+
+#
+# Get ssh host list.
+#
+get_ssh_list() {
+  echo $(config_get host) | awk -v user="$(config_get user)" '{
+    for(i=1; i<=NF; i++) {
+      if($i ~ /^[^@]+@[^@]+$/) {
+        print $i
+      } else {
+        host = (user ~ /^$/)? $i : user"@"$i;
+        print host
+      }
+    }
+  }'
+}
+
+#
+# Execute ssh command.
+#
+ssh_command() {
+  local url=$(get_ssh_list | head -n 1)
+  local forward_agent="`config_get forward-agent`"
+  local port="`config_get port`"
+
+  test -n "$forward_agent" && local agent="-A"
+  test -n "$port" && local port="-p $port"
+  test $NEEDS_TTY -eq 1 && local tty="-t"
+
+  ssh $tty $agent $port $url $@
+}
+
+#
+# Get <n>th deploy commit.
+#
+nth_deploy_commit() {
+  local n=$1
+  local path=`config_get path`
+  ssh_command "nl $path/.deploys | sort -nr | awk -v n=$n 'NR==n { print \$2 }'"
+}
+
+#
+# Revert to the <n>th last deployment.
+#
+revert_to() {
+  local n=$1
+  log "reverting $n deploy(s)"
+  local commit=`nth_deploy_commit $((n + 1))`
+  test -z $commit && abort invalid revert value $n
+  deploy "$commit"
+}
+
+#
+# List deploys.
+#
+list_deploys() {
+  local path=`config_get path`
+  ssh_command "nl $path/.deploys | sort -nr | cut -f 2-"
+}
+
+#
+# Deploy [ref].
+#
+deploy() {
+  local ref=$1
+  local path=$(config_get path)
+
+  if test $DRYRUN -ne 1; then
+    log deploying
+  else
+    log dry
+  fi
+
+  if test $DRYRUN -ne 1; then
+    log "check ssh connection"
+    get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh -T % ":"
+    test $? -eq 0 || abort ssh failed
+  fi
+
+  log export source
+
+  # make TMP directory
+  TMP="$(mktemp -d 2>/dev/null || mktemp -d -t $$ 2>/dev/null || echo /var/tmp/$$)"
+  test -d "$TMP" || mkdir -p $TMP
+  chmod 775 $TMP
+
+  # export
+  test -z "$ref" && ref=HEAD
+  git archive --format=tar $ref | tar -x -C $TMP; test ${PIPESTATUS[0]} -eq 0
+
+  test $? -eq 0 || abort git archive failed
+
+  local cmd_pre_rsync=$(config_get pre-rsync)
+  if test $DRYRUN -ne 1 -a -n "$cmd_pre_rsync"; then
+    log "executing pre-rsync \`$cmd_pre_rsync\`"
+    (cd $TMP; $cmd_pre_rsync)
+    test $? -eq 0 || abort pre-rsync failed
+  fi
+
+  # rsync
+  local rsync_option="-rlpDvc"
+  local exclude_from=
+  test -f $EXCLUDE_FILE && exclude_from="--exclude-from=$EXCLUDE_FILE"
+
+  if test $DRYRUN -eq 1; then
+    rsync $rsync_option --dry-run --delete --exclude=/.deploys $exclude_from ${TMP}/ $(get_ssh_list | head -n 1):$path
+    rm -rf $TMP
+    exit
+  fi
+
+  log rsync
+  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % rsync $rsync_option --delete --exclude=/.deploys $exclude_from ${TMP}/ %:$path
+  test $? -eq 0 || abort rsync failed
+
+  # deploy log
+  log "deploy log"
+  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh -T % "echo \"$(git --no-pager log --date=short --pretty='%h %ad %<(20)%an ● %s' -n 1 $REF)\" >> $path/.deploys"
+  test $? -eq 0 || warn deploy log append failed
+
+  local cmd_post_deploy=$(config_get post-deploy)
+  if test -n "$cmd_post_deploy"; then
+    log "executing post-deploy \`$cmd_post_deploy\`"
+    get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh -T % "cd $path && $cmd_post_deploy"
+    test $? -eq 0 || abort post-deploy failed
+  fi
+
+  rm -rf $TMP
+
+  # done
+  log successfully deployed $ref
+}
+
+#
+# Add webhook public key to authorized_keys of deployment host(s).
+#
+enable_webhook_ssh() {
+  local env_backup=$ENV
+
+  ENV=webhook
+  require_env
+  # get public key
+  local webhook_public_key=$(ssh_command "cat \$HOME/.ssh/id_rsa.pub")
+  test -z "$webhook_public_key" && abort failed to get webhook public key
+  # set ignoring of known_hosts error
+#  ssh_command "grep 'StrictHostKeyChecking no' \$HOME/.ssh/config >/dev/null 2>&1 || { echo 'StrictHostKeyChecking no' >> \$HOME/.ssh/config; chmod 600 \$HOME/.ssh/config; }"
+
+  ENV=$env_backup
+  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh -T % "grep '$webhook_public_key' \$HOME/.ssh/authorized_keys >/dev/null 2>&1 || echo $webhook_public_key >> \$HOME/.ssh/authorized_keys"
+  test $? -eq 0 || abort failed to add webhook public key to authorized_keys
+
+  local ssh_list=$(get_ssh_list)
+  ENV=webhook
+  NEEDS_TTY=1
+  for host in $ssh_list; do
+    ssh_command "ssh $host echo; echo Connected to $host"
+  done
+}
+
+#
+# Initialize ENV value.
+#
+initialize_env() {
+  test -z "$ENV" && ENV=$(git rev-parse --abbrev-ref HEAD)
+}
+
+#
+# Require environment arg.
+#
+require_env() {
+  config_section $ENV || abort "[$ENV] config section not defined"
+  test -z "$ENV" && abort "<env> required"
+}
+
+#
+# Ensure all changes are committed and pushed before deploying.
+#
+check_for_local_changes() {
+  git --no-pager diff --exit-code --quiet          || abort "commit or stash your changes before deploying"
+  git --no-pager diff --exit-code --quiet --cached || abort "commit your staged changes before deploying"
+  [ -z "`git rev-list @{upstream}.. -n 1`" ]       || abort "push your changes before deploying"
+}
+
+# parse argv
+
+while test $# -ne 0; do
+  arg=$1; shift
+  case $arg in
+    -h|--help) usage; exit ;;
+    -V|--version) version; exit ;;
+    -n|--dry-run) DRYRUN=1 ;;
+    -f|--force) FORCE=1 ;;
+    -P) PARALLEL=$1; shift;;
+    -E) ENV=$1; shift;;
+    revert) initialize_env; require_env; revert_to ${1:-1}; exit ;;
+    list) initialize_env; require_env; list_deploys; exit ;;
+    enable_webhook_ssh) initialize_env; require_env; enable_webhook_ssh; exit ;;
+    *)
+      if test -z "$REF"; then
+        REF="$arg";
+      fi
+      ;;
+  esac
+done
+
+initialize_env
+require_env
+test $FORCE -ne 1 && check_for_local_changes
+
+# deploy
+deploy "${REF:-`config_get ref`}"
