@@ -37,7 +37,7 @@ usage() {
 
     revert [n]           revert to [n]th last deployment or 1
     list                 list previous deploy commits
-    enable_webhook_ssh   Add webhook public key to deployment host(s)
+    setup_webhook_ssh   Add webhook public key to deployment host(s)
     [ref]                deploy to [ref], the 'ref' setting, or latest tag
 
 EOF
@@ -241,8 +241,8 @@ deploy() {
 #
 # Add webhook public key to authorized_keys of deployment host(s).
 #
-enable_webhook_ssh() {
-  local env_backup=$ENV
+setup_webhook_ssh() {
+  local env=$ENV
 
   ENV=webhook
   require_env
@@ -252,7 +252,7 @@ enable_webhook_ssh() {
   # set ignoring of known_hosts error
 #  ssh_command "grep 'StrictHostKeyChecking no' \$HOME/.ssh/config >/dev/null 2>&1 || { echo 'StrictHostKeyChecking no' >> \$HOME/.ssh/config; chmod 600 \$HOME/.ssh/config; }"
 
-  ENV=$env_backup
+  ENV=$env
   get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh -T % "grep '$webhook_public_key' \$HOME/.ssh/authorized_keys >/dev/null 2>&1 || echo $webhook_public_key >> \$HOME/.ssh/authorized_keys"
   test $? -eq 0 || abort failed to add webhook public key to authorized_keys
 
@@ -301,7 +301,7 @@ while test $# -ne 0; do
     -E) ENV=$1; shift;;
     revert) initialize_env; require_env; revert_to ${1:-1}; exit ;;
     list) initialize_env; require_env; list_deploys; exit ;;
-    enable_webhook_ssh) initialize_env; require_env; enable_webhook_ssh; exit ;;
+    setup_webhook_ssh) initialize_env; require_env; setup_webhook_ssh; exit ;;
     *)
       if test -z "$REF"; then
         REF="$arg";
