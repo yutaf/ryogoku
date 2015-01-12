@@ -13,5 +13,6 @@ forward-agent yes
 post-deploy /var/www/myapp.com/update.sh
 
 [webhook]
-user root
+user deploy
 host 128.199.132.104
+port 10022
