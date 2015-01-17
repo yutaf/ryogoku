@@ -188,9 +188,10 @@ deploy() {
   log export source
 
   # make TMP directory
-  TMP="$(mktemp -d 2>/dev/null || mktemp -d -t $$ 2>/dev/null || echo /var/tmp/$$)"
-  test -d "$TMP" || mkdir -p $TMP
-  chmod 775 $TMP
+  TMP="$(mktemp -u 2>/dev/null || mktemp -u -t $$ 2>/dev/null || echo /var/tmp/$$)"
+  mkdir -p $TMP
+  echo $TMP
+  exit
 
   # export
   test -z "$ref" && ref=HEAD
