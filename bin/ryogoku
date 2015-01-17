@@ -190,8 +190,6 @@ deploy() {
   # make TMP directory
   TMP="$(mktemp -u 2>/dev/null || mktemp -u -t $$ 2>/dev/null || echo /var/tmp/$$)"
   mkdir -p $TMP
-  echo $TMP
-  exit
 
   # export
   test -z "$ref" && ref=HEAD
