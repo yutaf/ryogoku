@@ -260,6 +260,7 @@ setup_webhook_ssh() {
   NEEDS_TTY=1
   for host in $ssh_list; do
     ssh_command "ssh $host echo; echo Connected to $host"
+    echo
   done
 }
 
