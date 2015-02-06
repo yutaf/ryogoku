@@ -310,6 +310,9 @@ while test $# -ne 0; do
   esac
 done
 
+# move to repository root
+cd $(git rev-parse --show-toplevel)
+
 initialize_env
 require_env
 test $FORCE -ne 1 && check_for_local_changes
