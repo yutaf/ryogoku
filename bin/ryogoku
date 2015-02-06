@@ -199,11 +199,9 @@ deploy() {
   test $? -eq 0 || abort git archive failed
 
   local cmd_pre_rsync=$(config_get pre-rsync)
-  if test $DRYRUN -ne 1 -a -n "$cmd_pre_rsync"; then
-    log "executing pre-rsync \`$cmd_pre_rsync\`"
-    (cd $TMP; $cmd_pre_rsync)
-    test $? -eq 0 || abort pre-rsync failed
-  fi
+  log "executing pre-rsync \`$cmd_pre_rsync\`"
+  (cd $TMP; $cmd_pre_rsync)
+  test $? -eq 0 || abort pre-rsync failed
 
   # rsync
   local rsync_option=$(config_get rsync-option)
