@@ -6,6 +6,7 @@ REF=
 ENV=
 TMP=
 EXCLUDE_FILE=./rsync-exclude
+RSYNC_OPTION=-rlpDvc
 DRYRUN=0
 FORCE=0
 PARALLEL=10
@@ -205,18 +206,23 @@ deploy() {
   fi
 
   # rsync
-  local rsync_option="-rlpDvc"
+  local rsync_option=$(config_get rsync-option)
+  test -n "$rsync_option" && RSYNC_OPTION=$rsync_option
+
+  local exclude_file=$(config_get rsync-exclude)
+  test -n "$exclude_file" && EXCLUDE_FILE=$exclude_file
+
   local exclude_from=
   test -f $EXCLUDE_FILE && exclude_from="--exclude-from=$EXCLUDE_FILE"
 
   if test $DRYRUN -eq 1; then
-    rsync $rsync_option --dry-run --delete --exclude=/.deploys $exclude_from ${TMP}/ $(get_ssh_list | head -n 1):$path
+    rsync $RSYNC_OPTION --dry-run --delete --exclude=/.deploys $exclude_from ${TMP}/ $(get_ssh_list | head -n 1):$path
     rm -rf $TMP
     exit
   fi
 
   log rsync
-  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % rsync $rsync_option --delete --exclude=/.deploys $exclude_from ${TMP}/ %:$path
+  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % rsync $RSYNC_OPTION --delete --exclude=/.deploys $exclude_from ${TMP}/ %:$path
   test $? -eq 0 || abort rsync failed
 
   # deploy log
