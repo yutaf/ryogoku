@@ -210,7 +210,6 @@ deploy() {
   local exclude_file=$(config_get rsync-exclude)
   # Cut initail "./"
   test -n "$exclude_file" && EXCLUDE_FILE=$(echo $exclude_file | sed 's;^\./;;')
-  echo $EXCLUDE_FILE
 
   local exclude_from=
   test -f $EXCLUDE_FILE && exclude_from="--exclude-from=$EXCLUDE_FILE --exclude=$EXCLUDE_FILE"
