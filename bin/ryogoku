@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.0.1"
+VERSION="0.0.3"
 CONFIG=ryogoku.conf
 REF=
 ENV=
@@ -196,6 +196,9 @@ deploy() {
   # make TMP directory
   TMP="$(mktemp -u 2>/dev/null || mktemp -u -t $$ 2>/dev/null || echo /var/tmp/$$)"
   mkdir -p $TMP
+
+  # trap to rm $TMP
+  trap "rm -rf $TMP" ERR
 
   # export
   local umask_value=$(config_get umask)
