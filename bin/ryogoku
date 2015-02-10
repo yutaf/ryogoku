@@ -198,6 +198,8 @@ deploy() {
   mkdir -p $TMP
 
   # export
+  local umask_value=$(config_get umask)
+  test -n "$umask_value" && umask $umask_value
   test -z "$ref" && ref=HEAD
   git archive --format=tar $ref | tar -x -C $TMP; test ${PIPESTATUS[0]} -eq 0
 
