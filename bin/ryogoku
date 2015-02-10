@@ -6,6 +6,7 @@ REF=
 ENV=
 TMP=
 EXCLUDE_FILE=rsync-exclude
+# -u (--update) is not good for rollback
 RSYNC_OPTION=-rlpDvcK
 DRYRUN=0
 FORCE=0
