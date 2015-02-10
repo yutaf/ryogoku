@@ -177,7 +177,7 @@ deploy() {
   if test $DRYRUN -ne 1; then
     log deploying
   else
-    log dry
+    log DRYRUN MODE
   fi
 
   if test $DRYRUN -ne 1; then
