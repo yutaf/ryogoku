@@ -26,6 +26,10 @@ usage() {
 
   Usage: ryogoku [options] [command]
 
+  default rsync option is $RSYNC_OPTION
+
+  You can override it in config file with indicating "rsync-option"
+
   Options:
 
     -V, --version        output program versions
