@@ -1,6 +1,6 @@
 # ryogoku
 
-Minimal deployment tool with git, rsync, ssh
+Simple rsync deployment tool
 
 ## License
 
