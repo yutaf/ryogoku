@@ -94,8 +94,8 @@ config_section() {
 # Get config value by <key>.
 #
 config_get() {
-  local nr_env=$(awk "/^\[$ENV/ { print NR }" $CONFIG)
-  local nr_next_env=$(awk "NR > $nr_env && /^\[/ { print NR; exit }" $CONFIG)
+  local nr_env=$(nl -b a $CONFIG | grep $ENV | cut -f 1 | sed 's/ *//g')
+  local nr_next_env=$(awk -v nr_env=$nr_env 'NR > nr_env && /^\[/ { print NR; exit }' $CONFIG)
   test -z "$nr_next_env" && nr_next_env='$'
 
   local key=$1
