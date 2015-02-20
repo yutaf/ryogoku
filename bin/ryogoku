@@ -204,7 +204,7 @@ deploy() {
   test -z "$ref" && ref=HEAD
   git archive --format=tar $ref | tar -x -C $TMP; test ${PIPESTATUS[0]} -eq 0
 
-  test $? -eq 0 || abort git archive failed
+  test $? -eq 0 || abort "git archive failed.\n\n  indicated revision: $ref\n\n  If you were trying to revert, \`git fetch --all\` might solve the problem."
 
   local cmd_pre_rsync=$(config_get pre-rsync)
   log "executing pre-rsync \`$cmd_pre_rsync\`"
