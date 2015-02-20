@@ -9,7 +9,6 @@ EXCLUDE_FILE=rsync-exclude
 # -u (--update) is not good for rollback
 RSYNC_OPTION="-rlpDvcK --delete"
 DRYRUN=0
-FORCE=0
 PARALLEL=10
 NEEDS_TTY=0
 
@@ -35,7 +34,6 @@ usage() {
     -V, --version        output program versions
     -h, --help           output help information
     -n, --dry-run        show what would have been transferred
-    -f, --force          force deploy even if commit or push are undone
     -P <n>               Set max number of parallel execution. default: $PARALLEL
     -E <ENV>             Set config section to use
 
@@ -313,7 +311,6 @@ while test $# -ne 0; do
     -h|--help) usage; exit ;;
     -V|--version) version; exit ;;
     -n|--dry-run) DRYRUN=1 ;;
-    -f|--force) FORCE=1 ;;
     -P) PARALLEL=$1; shift;;
     -E) ENV=$1; shift;;
     revert) initialize_env; require_env; revert_to ${1:-1}; exit ;;
@@ -332,7 +329,7 @@ cd $(git rev-parse --show-toplevel)
 
 initialize_env
 require_env
-test $FORCE -ne 1 && check_for_local_changes
+check_for_local_changes
 
 # deploy
 deploy "${REF:-`config_get ref`}"
