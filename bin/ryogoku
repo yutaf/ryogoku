@@ -236,7 +236,7 @@ deploy() {
 
   # deploy log
   log "deploy log"
-  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh -T % "echo \"$(git --no-pager log --date=short --pretty='%h %ad %<(20)%an ● %s' -n 1 $REF)\" >> $path/.deploys"
+  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh -T % "echo \"$(git --no-pager log --date=short --pretty='%h %ad %<(20)%an ● %s' -n 1 $ref)\" >> $path/.deploys"
   test $? -eq 0 || warn deploy log append failed
 
   local cmd_post_deploy=$(config_get post-deploy)
