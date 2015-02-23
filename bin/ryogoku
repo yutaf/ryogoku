@@ -208,7 +208,7 @@ deploy() {
 
   local cmd_pre_rsync=$(config_get pre-rsync)
   log "executing pre-rsync \`$cmd_pre_rsync\`"
-  (cd $TMP; $cmd_pre_rsync)
+  (cd $TMP; eval $cmd_pre_rsync)
   test $? -eq 0 || abort pre-rsync failed
 
   # rsync
@@ -240,7 +240,7 @@ deploy() {
   local cmd_post_deploy=$(config_get post-deploy)
   if test -n "$cmd_post_deploy"; then
     log "executing post-deploy \`$cmd_post_deploy\`"
-    get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh -T % "cd $path && $cmd_post_deploy"
+    get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh -T % "cd $path && eval $cmd_post_deploy"
     test $? -eq 0 || abort post-deploy failed
   fi
 
