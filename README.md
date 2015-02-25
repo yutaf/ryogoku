@@ -19,7 +19,7 @@ Further more, you can set some directives in config file like
 * umask
 
 More detail is described in the rest parts.  
-Please check them.
+Please read them.
 
 ## Requirements
 
@@ -31,7 +31,7 @@ Please check them.
 $ make install
 ```
 
-# How
+## How to use
 
 * You need to be inside the git repository to deploy.
 * Set ryogoku.conf file properly.
