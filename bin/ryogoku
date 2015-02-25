@@ -42,7 +42,7 @@ usage() {
     revert [n]           revert to [n]th last deployment or 1
     list                 list previous deploy commits
     setup_webhook_ssh    Copy webhook public key to deployment host(s)
-    [ref]                deploy to [ref], the 'ref' setting, or latest tag
+    [ref]                deploys indicated [ref]. i.e. bcb07e2, HEAD^^. default: HEAD
 
 EOF
 }
