@@ -290,7 +290,7 @@ initialize_env() {
 # Require environment arg.
 #
 require_env() {
-  config_section $ENV || cecho $RED "[$ENV] config section not defined"; exit $EXIT_STATUS_CONFIG_SECTION_NOT_DEFINED
+  config_section $ENV || { cecho $RED "[$ENV] config section not defined" 1>&2; exit $EXIT_STATUS_CONFIG_SECTION_NOT_DEFINED; }
   test -z "$ENV" && abort "<env> required"
 }
 
