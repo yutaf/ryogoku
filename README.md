@@ -167,6 +167,10 @@ You can use `&&` operator for multiple commands or scripts.
 post-deploy /var/www/myapp.com/update.sh && /var/www/myapp.com/update.master.sh
 ```
 
+## Specific exit status
+
+* `91` ... config section is not defined.
+
 ## License
 
 The MIT License (MIT)

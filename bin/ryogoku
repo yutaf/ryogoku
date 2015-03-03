@@ -12,6 +12,8 @@ DRYRUN=0
 PARALLEL=10
 NEEDS_TTY=0
 
+EXIT_STATUS_CONFIG_SECTION_NOT_DEFINED=91
+
 RED=31
 GREEN=32
 YELLOW=33
@@ -288,7 +290,7 @@ initialize_env() {
 # Require environment arg.
 #
 require_env() {
-  config_section $ENV || abort "[$ENV] config section not defined"
+  config_section $ENV || cecho $RED "[$ENV] config section not defined"; exit $EXIT_STATUS_CONFIG_SECTION_NOT_DEFINED
   test -z "$ENV" && abort "<env> required"
 }
 
