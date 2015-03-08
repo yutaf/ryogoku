@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-VERSION="0.1.0"
+VERSION="0.2.0"
 CONFIG=ryogoku.conf
-REF=
 ENV=
+REF=
 TMP=
 EXCLUDE_FILE=rsync-exclude
 # -u (--update) is not good for rollback
@@ -12,6 +12,7 @@ DRYRUN=0
 PARALLEL=10
 NEEDS_TTY=0
 
+CONFIG_SECTION_WEBHOOK=webhook
 EXIT_STATUS_CONFIG_SECTION_NOT_DEFINED=91
 
 RED=31
@@ -25,7 +26,7 @@ BLUE=34
 usage() {
   cat <<-EOF
 
-  Usage: ryogoku [options] [command]
+  Usage: ryogoku [options] <env> [command]
 
   default rsync option is "$RSYNC_OPTION"
 
@@ -39,7 +40,6 @@ usage() {
     -h, --help           output help information
     -n, --dry-run        show what would have been transferred
     -P <n>               Set max number of parallel execution. default: $PARALLEL
-    -E <ENV>             Set config section to use
 
   Commands:
 
@@ -96,7 +96,7 @@ config_section() {
 # Get config value by <key>.
 #
 config_get() {
-  local nr_env=$(nl -b a $CONFIG | grep $ENV | cut -f 1 | sed 's/ *//g')
+  local nr_env=$(nl -b a $CONFIG | grep -m 1 "\[$ENV" | cut -f 1 | sed 's/ *//g')
   local nr_next_env=$(awk -v nr_env=$nr_env 'NR > nr_env && /^\[/ { print NR; exit }' $CONFIG)
   test -z "$nr_next_env" && nr_next_env='$'
 
@@ -260,12 +260,12 @@ deploy() {
 setup_webhook_ssh() {
   local env=$ENV
 
-  ENV=webhook
+  ENV=$CONFIG_SECTION_WEBHOOK
   require_env
   # get public key
   local webhook_public_key=$(ssh_command "cat \$HOME/.ssh/id_rsa.pub")
   test -z "$webhook_public_key" && abort failed to get webhook public key
-  # set ignoring of known_hosts error
+  # disable known_hosts check
 #  ssh_command "grep 'StrictHostKeyChecking no' \$HOME/.ssh/config >/dev/null 2>&1 || { echo 'StrictHostKeyChecking no' >> \$HOME/.ssh/config; chmod 600 \$HOME/.ssh/config; }"
 
   ENV=$env
@@ -273,19 +273,12 @@ setup_webhook_ssh() {
   test $? -eq 0 || abort failed to add webhook public key to authorized_keys
 
   local ssh_list=$(get_ssh_list)
-  ENV=webhook
+  ENV=$CONFIG_SECTION_WEBHOOK
   NEEDS_TTY=1
   for host in $ssh_list; do
     ssh_command "ssh $host echo; echo Connected to $host"
     echo
   done
-}
-
-#
-# Initialize ENV value.
-#
-initialize_env() {
-  test -z "$ENV" && ENV=$(git rev-parse --abbrev-ref HEAD)
 }
 
 #
@@ -316,13 +309,14 @@ while test $# -ne 0; do
     -V|--version) version; exit ;;
     -n|--dry-run) DRYRUN=1 ;;
     -P) PARALLEL=$1; shift;;
-    -E) ENV=$1; shift;;
-    revert) initialize_env; require_env; revert_to ${1:-1}; exit ;;
-    list) initialize_env; require_env; list_deploys; exit ;;
-    setup_webhook_ssh) initialize_env; require_env; setup_webhook_ssh; exit ;;
+    revert) require_env; revert_to ${1:-1}; exit ;;
+    list) require_env; list_deploys; exit ;;
+    setup_webhook_ssh) require_env; setup_webhook_ssh; exit ;;
     *)
-      if test -z "$REF"; then
-        REF="$arg";
+      if test -z "$ENV"; then
+        ENV=$arg
+      else
+        REF="$REF $arg";
       fi
       ;;
   esac
@@ -331,9 +325,8 @@ done
 # move to repository root
 cd $(git rev-parse --show-toplevel)
 
-initialize_env
 require_env
 check_for_local_changes
 
 # deploy
-deploy "${REF:-`config_get ref`}"
+deploy $REF

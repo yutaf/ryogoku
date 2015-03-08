@@ -46,15 +46,20 @@ $ ryogoku
 ## Usage
 
 ```
-  Usage: ryogoku [options] [command]
+  Usage: ryogoku [options] <env> [command]
+
+  default rsync option is "-rlpDvcK --delete"
+
+  default rsync's "--exclude-from=" path is REPOSITORY-ROOT/rsync-exclude
+
+  config file path is REPOSITORY-ROOT/ryogoku.conf
 
   Options:
 
     -V, --version        output program versions
     -h, --help           output help information
     -n, --dry-run        show what would have been transferred
-    -P <n>               Set max number of parallel execution
-    -E <ENV>             Set config section to use
+    -P <n>               Set max number of parallel execution. default: 10
 
   Commands:
 
@@ -62,7 +67,6 @@ $ ryogoku
     list                 list previous deploy commits
     setup_webhook_ssh    Add webhook public key to deployment host(s)'s authorized_keys
     [ref]                deploys indicated [ref]. i.e. bcb07e2, HEAD^^. default: HEAD
-
 ```
 
 ## Configuration
