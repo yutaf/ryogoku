@@ -4,12 +4,12 @@ Simple rsync deployment shell script
 
 ## How it works
 
-This script deploys your git repository files to the indicated hosts by rsync.  
+This script deploys your git repository to the indicated hosts by rsync.
 
 ### deployment flow
-First, it extracts the indicated revision files to a temporary directory.  
-Then rsync them to the hosts.  
-Finally the temporary directory is removed.  
+1. extracts the indicated revision files to a temporary directory.  
+2. rsync them to the hosts.  
+3. removes the temporary directory  
 
 Further more, you can set some directives in config file like
 
@@ -27,20 +27,22 @@ Please read them.
 
 ## Installation
 
+Clone this repository, and
+
 ```
 $ make install
 ```
 
 ## How to use
 
-* You need to be inside the git repository to deploy.
-* Set ryogoku.conf file properly.
+* You need to be inside the git repository to deploy
+* Add `<env>` info you will deploy to to ryogoku.conf
 * Checkout the branch to deploy
 
 then
 
 ```
-$ ryogoku
+$ ryogoku <env>
 ```
 
 ## Usage
@@ -130,27 +132,26 @@ Deployment path.
 path /var/www/html
 ```
 
-### umask
+### umask (optional)
 
 Sets umask before extracting source files.
 
-### rsync-option
+### rsync-option (optional)
 
 ```
 rsync-option -rlpDvcK
 ```
 
-### rsync-exclude
+### rsync-exclude (optional)
 
-is the argument for rsync's `--exclude-from=`  
-This is optional.  
+This is the argument for rsync's `--exclude-from=`  
 If this directive is not specified, ryogoku searches default path; `REPOSITORY-ROOT/rsync-exclude`
 
 ```
 rsync-exclude .deploy/rsync-exclude
 ```
 
-### pre-rsync
+### pre-rsync (optional)
 
 You can execute commands or scripts to the extracted files before rsync.  
 The commands or scripts are executed at the directory root,  
@@ -161,7 +162,7 @@ You can use `&&` operator for multiple commands or scripts.
 pre-rsync ./bin/pre-rsync
 ```
 
-### post-deploy
+### post-deploy (optional)
 
 executes commands or scripts to the deployment hosts after rsync.  
 They are executed in indicated `path`.  
