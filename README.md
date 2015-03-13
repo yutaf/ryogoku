@@ -136,7 +136,7 @@ path /var/www/html
 ### ref (optional)
 
 When specified, indicated revision files are extracted.  
-If specified in command line, command line's value precedes than config one.  
+If specified in command line, command line's value precedes config one.  
 Neither specified, it is set to `HEAD`.
 
 ### umask (optional)
