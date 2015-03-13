@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.2.0"
+VERSION="0.2.1"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -329,4 +329,4 @@ require_env
 check_for_local_changes
 
 # deploy
-deploy $REF
+deploy "${REF:-`config_get ref`}"

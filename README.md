@@ -80,18 +80,19 @@ Locate ryogoku.conf in the git repository root
 user deploy
 host 128.199.170.128 128.199.244.193
 path /var/www/html
-forward-agent yes
+ref heads/master
 pre-rsync ./bin/pre-rsync
 rsync-option -rlpDvcK
-rsync-exclude ./rsync-exclude
+rsync-exclude .deploy/rsync-exclude
 post-deploy /var/www/myapp.com/update.sh && /var/www/myapp.com/update.master.sh
 umask 022
 
 [develop]
 host deploy@128.199.170.128 john@128.199.244.193
 path /var/www/html
+ref heads/develop
 rsync-option -rlpDvcK
-rsync-exclude ./rsync-exclude
+rsync-exclude .deploy/rsync-exclude
 post-deploy /var/www/myapp.com/update.sh && /var/www/myapp.com/update.develop.sh
 
 [webhook]
@@ -131,6 +132,12 @@ Deployment path.
 ```
 path /var/www/html
 ```
+
+### ref (optional)
+
+When specified, indicated revision files are extracted.  
+If specified in command line, command line's value precedes than config one.  
+Neither specified, it is set to `HEAD`.
 
 ### umask (optional)
 

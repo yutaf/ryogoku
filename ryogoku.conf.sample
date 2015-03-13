@@ -2,7 +2,7 @@
 user deploy
 host 128.199.170.128 128.199.244.193
 path /var/www/html
-forward-agent yes
+ref heads/master
 pre-rsync ./bin/pre-rsync
 rsync-option -rlpDvcK
 rsync-exclude .deploy/rsync-exclude
@@ -12,6 +12,7 @@ umask 022
 [develop]
 host deploy@128.199.170.128 john@128.199.244.193
 path /var/www/html
+ref heads/develop
 rsync-option -rlpDvcK
 rsync-exclude .deploy/rsync-exclude
 post-deploy /var/www/myapp.com/update.sh && /var/www/myapp.com/update.develop.sh
