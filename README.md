@@ -13,7 +13,7 @@ This script deploys your git repository to the indicated hosts by rsync.
 
 Further more, you can set some directives in config file like
 
-* commands or scripts which are executed at pre and post deployment
+* commands or scripts which are executed at pre or post deployment or both
 * rsync option
 * file path for rsync's `--exclude-from`
 * umask
