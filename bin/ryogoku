@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.2.2"
+VERSION="0.3.0"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -55,7 +55,6 @@ EOF
 # Abort with <msg>.
 #
 abort() {
-  test -d "$TMP" && rm -rf $TMP
   echo
   cecho $RED "  $@" 1>&2
   echo
@@ -196,19 +195,27 @@ deploy() {
   log export source
 
   # make TMP directory
-  TMP="$(mktemp -u 2>/dev/null || mktemp -u -t $$ 2>/dev/null || echo /var/tmp/$$)"
-  mkdir -p $TMP
-
-  # trap to rm $TMP
-  trap "rm -rf $TMP" ERR
+  TMP=/var/tmp/ryogoku/$(basename $(pwd))
+  test -d "$TMP" || mkdir -p $TMP
 
   # export
   local umask_value=$(config_get umask)
   test -n "$umask_value" && umask $umask_value
-  test -z "$ref" && ref=HEAD
-  git archive --format=tar $ref | tar -x -C $TMP; test ${PIPESTATUS[0]} -eq 0
+  test -z "$ref" && ref=origin/$(git rev-parse --abbrev-ref HEAD)
 
-  test $? -eq 0 || abort "git archive failed.\n\n  indicated revision: $ref\n\n  If you were trying to revert, \`git fetch --all\` might solve the problem."
+  local repository=$(pwd)
+  (cd $TMP; git rev-parse 2> /dev/null)
+  test $? -ne 0 && (cd $TMP; git clone $repository . || abort failed to clone)
+
+  # fetch source
+  log fetching updates
+  (cd $TMP; git fetch --all)
+  test $? -eq 0 || abort fetch failed
+
+  # reset HEAD
+  log resetting HEAD to $ref
+  (cd $TMP; git reset --hard $ref)
+  test $? -eq 0 || abort git reset failed
 
   local cmd_pre_rsync=$(config_get pre-rsync)
   log "executing pre-rsync \`$cmd_pre_rsync\`"
@@ -228,7 +235,6 @@ deploy() {
 
   if test $DRYRUN -eq 1; then
     rsync $RSYNC_OPTION --dry-run --exclude=/.deploys --exclude=$CONFIG $exclude_from ${TMP}/ $(get_ssh_list | head -n 1):$path
-    rm -rf $TMP
     exit
   fi
 
@@ -247,8 +253,6 @@ deploy() {
     get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh -T % "cd $path && eval $cmd_post_deploy"
     test $? -eq 0 || abort post-deploy failed
   fi
-
-  rm -rf $TMP
 
   # done
   log successfully deployed $ref
