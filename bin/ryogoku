@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.2.1"
+VERSION="0.2.2"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -89,14 +89,14 @@ warn() {
 # Check if config <section> exists.
 #
 config_section() {
-  grep "^\[$1" $CONFIG &> /dev/null
+  grep "^\[$1\]" $CONFIG &> /dev/null
 }
 
 #
 # Get config value by <key>.
 #
 config_get() {
-  local nr_env=$(nl -b a $CONFIG | grep -m 1 "\[$ENV" | cut -f 1 | sed 's/ *//g')
+  local nr_env=$(nl -b a $CONFIG | grep -m 1 "\[$ENV\]" | cut -f 1 | sed 's/ *//g')
   local nr_next_env=$(awk -v nr_env=$nr_env 'NR > nr_env && /^\[/ { print NR; exit }' $CONFIG)
   test -z "$nr_next_env" && nr_next_env='$'
 
