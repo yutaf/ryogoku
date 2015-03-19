@@ -2,25 +2,6 @@
 
 Simple rsync deployment shell script
 
-## How it works
-
-This script deploys your git repository to the indicated hosts by rsync.
-
-### deployment flow
-1. extracts the indicated revision files to a temporary directory.  
-2. rsync them to the hosts.  
-3. removes the temporary directory  
-
-Further more, you can set some directives in config file like
-
-* commands or scripts which are executed at pre or post deployment or both
-* rsync option
-* file path for rsync's `--exclude-from`
-* umask
-
-More detail is described in the rest parts.  
-Please read them.
-
 ## Requirements
 
 * git
@@ -68,7 +49,7 @@ $ ryogoku <env>
     revert [n]           revert to [n]th last deployment or 1
     list                 list previous deploy commits
     setup_webhook_ssh    Add webhook public key to deployment host(s)'s authorized_keys
-    [ref]                deploys indicated [ref]. i.e. bcb07e2, HEAD^^. default: HEAD
+    [ref]                deploys indicated [ref].
 ```
 
 ## Configuration
@@ -76,7 +57,7 @@ $ ryogoku <env>
 Locate ryogoku.conf in the git repository root
 
 ```
-[master]
+[prod]
 user deploy
 host 128.199.170.128 128.199.244.193
 path /var/www/html
@@ -87,7 +68,7 @@ rsync-exclude .deploy/rsync-exclude
 post-deploy /var/www/myapp.com/update.sh && /var/www/myapp.com/update.master.sh
 umask 022
 
-[develop]
+[stage]
 host deploy@128.199.170.128 john@128.199.244.193
 path /var/www/html
 ref heads/develop
