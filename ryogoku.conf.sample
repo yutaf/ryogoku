@@ -1,4 +1,4 @@
-[master]
+[prod]
 user deploy
 host 128.199.170.128 128.199.244.193
 path /var/www/html
@@ -9,7 +9,7 @@ rsync-exclude .deploy/rsync-exclude
 post-deploy /var/www/myapp.com/update.sh && /var/www/myapp.com/update.master.sh
 umask 022
 
-[develop]
+[stage]
 host deploy@128.199.170.128 john@128.199.244.193
 path /var/www/html
 ref heads/develop
