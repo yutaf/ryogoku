@@ -46,7 +46,7 @@ usage() {
     revert [n]           revert to [n]th last deployment or 1
     list                 list previous deploy commits
     setup_webhook_ssh    Add webhook public key to deployment host(s)'s authorized_keys
-    [ref]                deploys indicated [ref]. i.e. bcb07e2, HEAD^^. default: HEAD
+    [ref]                deploys indicated [ref].
 
 EOF
 }
