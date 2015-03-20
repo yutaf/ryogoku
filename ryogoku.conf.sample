@@ -7,7 +7,7 @@ pre-rsync ./bin/pre-rsync
 rsync-option -rlpDvcK
 rsync-exclude .deploy/rsync-exclude
 post-deploy /var/www/myapp.com/update.sh && /var/www/myapp.com/update.master.sh
-umask 022
+umask 002
 
 [stage]
 host deploy@128.199.170.128 john@128.199.244.193
@@ -16,6 +16,7 @@ ref heads/develop
 rsync-option -rlpDvcK
 rsync-exclude .deploy/rsync-exclude
 post-deploy /var/www/myapp.com/update.sh && /var/www/myapp.com/update.develop.sh
+umask 002
 
 [webhook]
 user deploy

@@ -23,7 +23,7 @@ $ make install
 then
 
 ```
-$ ryogoku <env>
+$ ryogoku <env> [ref]
 ```
 
 ## Usage
@@ -66,7 +66,7 @@ pre-rsync ./bin/pre-rsync
 rsync-option -rlpDvcK
 rsync-exclude .deploy/rsync-exclude
 post-deploy /var/www/myapp.com/update.sh && /var/www/myapp.com/update.master.sh
-umask 022
+umask 002
 
 [stage]
 host deploy@128.199.170.128 john@128.199.244.193
@@ -75,11 +75,7 @@ ref heads/develop
 rsync-option -rlpDvcK
 rsync-exclude .deploy/rsync-exclude
 post-deploy /var/www/myapp.com/update.sh && /var/www/myapp.com/update.develop.sh
-
-[webhook]
-user deploy
-host 128.199.132.104
-port 10022
+umask 002
 ```
 
 ## Directives
@@ -122,7 +118,9 @@ Neither specified, it is set to `HEAD`.
 
 ### umask (optional)
 
-Sets umask before extracting source files.
+Sets umask before extracting source files.  
+If you use this directive, you should add same umask value to all envs in config.  
+Or permissions are going to be random by each files.
 
 ### rsync-option (optional)
 
