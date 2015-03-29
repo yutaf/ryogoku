@@ -17,7 +17,8 @@ $ make install
 ## How to use
 
 * You need to be inside the git repository to deploy
-* Add `<env>` info you will deploy to to ryogoku.conf
+* Create ryogoku.conf in git repository root
+* Add `<env>` section to ryogoku.conf
 * Checkout the branch to deploy
 
 then
@@ -58,23 +59,20 @@ Locate ryogoku.conf in the git repository root
 
 ```
 [prod]
-user deploy
+user rob
 host 128.199.170.128 128.199.244.193
 path /var/www/html
-ref heads/master
+ref origin/master
 pre-rsync ./bin/pre-rsync
-rsync-option -rlpDvcK
-rsync-exclude .deploy/rsync-exclude
-post-deploy /var/www/myapp.com/update.sh && /var/www/myapp.com/update.master.sh
+post-deploy /var/www/html/bin/update.sh && /var/www/html/bin/update.prod.sh
 umask 002
 
 [stage]
-host deploy@128.199.170.128 john@128.199.244.193
+host jimmy@128.199.170.128 jimmy@128.199.244.193
 path /var/www/html
-ref heads/develop
-rsync-option -rlpDvcK
-rsync-exclude .deploy/rsync-exclude
-post-deploy /var/www/myapp.com/update.sh && /var/www/myapp.com/update.develop.sh
+ref origin/develop
+pre-rsync ./bin/pre-rsync
+post-deploy /var/www/html/bin/update.sh && /var/www/html/bin/update.stage.sh
 umask 002
 ```
 
