@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.3.1"
+VERSION="0.3.2"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -216,6 +216,10 @@ deploy() {
   log resetting HEAD to $ref
   (cd $TMP; git reset --hard $ref)
   test $? -eq 0 || abort git reset failed
+
+  # clean
+  log clean
+  (cd $TMP; git clean -d -f)
 
   local cmd_pre_rsync=$(config_get pre-rsync)
   log "executing pre-rsync \`$cmd_pre_rsync\`"
