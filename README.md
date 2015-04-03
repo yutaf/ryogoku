@@ -14,6 +14,12 @@ Clone this repository, and
 $ make install
 ```
 
+## blog
+
+I wrote a blog post.  
+
+<http://yutaf.github.io/ryogoku/>
+
 ## How to use
 
 * You need to be inside the git repository to deploy
