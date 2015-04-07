@@ -18,7 +18,7 @@ $ make install
 
 I wrote a blog post.  
 
-<http://yutaf.github.io/ryogoku/>
+<http://yutaf.github.io/i-made-a-deployment-tool-ryogoku/>
 
 ## How to use
 
