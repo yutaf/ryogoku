@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.4.1"
+VERSION="0.4.2"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -43,6 +43,7 @@ usage() {
 
   Commands:
 
+    init                 create config files
     update               update ryogoku to the latest release
     revert [n]           revert to [n]th last deployment or 1
     list                 list previous deploy commits
@@ -187,6 +188,34 @@ update() {
   && make install \
   && log "updated $VERSION -> `./bin/ryogoku --version`"
   rm -rf $tmp
+}
+
+#
+# Initialize
+#
+init() {
+  git rev-parse 2> /dev/null || abort not a git repository
+  local config=$(git rev-parse --show-toplevel)/${CONFIG}
+  test -e $config || {
+    cat <<-EOF > $config
+[prod]
+user 
+host 
+path 
+ref 
+rsync-option 
+pre-rsync 
+post-deploy 
+umask 
+EOF
+    log create $config
+  }
+
+  local exclude_file=$(git rev-parse --show-toplevel)/${EXCLUDE_FILE}
+  test -e $exclude_file || {
+    touch $exclude_file
+    log create $exclude_file
+  }
 }
 
 #
@@ -345,6 +374,7 @@ while test $# -ne 0; do
     list) require_env; list_deploys; exit ;;
     setup_webhook_ssh) require_env; setup_webhook_ssh; exit ;;
     update) update; exit ;;
+    init) init; exit ;;
     *)
       if test -z "$ENV"; then
         ENV=$arg

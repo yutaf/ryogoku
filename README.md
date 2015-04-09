@@ -58,6 +58,7 @@ $ ryogoku <env> [ref]
 
   Commands:
 
+    init                 create config files
     update               update ryogoku to the latest release
     revert [n]           revert to [n]th last deployment or 1
     list                 list previous deploy commits
