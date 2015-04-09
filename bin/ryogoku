@@ -198,7 +198,7 @@ init() {
   local config=$(git rev-parse --show-toplevel)/${CONFIG}
   test -e $config || {
     cat <<-EOF > $config
-[prod]
+[env]
 user 
 host 
 path 
