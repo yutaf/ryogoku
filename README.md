@@ -53,6 +53,7 @@ $ ryogoku <env> [ref]
 
   Commands:
 
+    update               update ryogoku to the latest release
     revert [n]           revert to [n]th last deployment or 1
     list                 list previous deploy commits
     setup_webhook_ssh    Add webhook public key to deployment host(s)'s authorized_keys

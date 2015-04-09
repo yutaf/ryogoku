@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.3.3"
+VERSION="0.4.0"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -43,6 +43,7 @@ usage() {
 
   Commands:
 
+    update               update ryogoku to the latest release
     revert [n]           revert to [n]th last deployment or 1
     list                 list previous deploy commits
     setup_webhook_ssh    Add webhook public key to deployment host(s)'s authorized_keys
@@ -171,6 +172,21 @@ revert_to() {
 list_deploys() {
   local path=`config_get path`
   ssh_command "nl $path/.deploys | sort -nr | cut -f 2-"
+}
+
+#
+# Update ryogoku
+#
+update() {
+  log "updating ryogoku(1)"
+  local tmp=$(mktemp -u 2>/dev/null || mktemp -u -t $$ 2>/dev/null || echo /var/tmp/$$)
+  git clone git@github.com:yutaf/ryogoku.git \
+    --depth 1 \
+    $tmp \
+  && cd $tmp \
+  && make install \
+  && log "updated $VERSION -> `./bin/ryogoku --version`"
+  rm -rf $tmp
 }
 
 #
@@ -328,6 +344,7 @@ while test $# -ne 0; do
     revert) require_env; revert_to ${1:-1}; exit ;;
     list) require_env; list_deploys; exit ;;
     setup_webhook_ssh) require_env; setup_webhook_ssh; exit ;;
+    update) update; exit ;;
     *)
       if test -z "$ENV"; then
         ENV=$arg
