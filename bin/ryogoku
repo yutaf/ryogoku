@@ -30,9 +30,9 @@ usage() {
 
   default rsync option is "$RSYNC_OPTION"
 
-  default rsync's "--exclude-from=" path is REPOSITORY-ROOT/$EXCLUDE_FILE
+  default rsync's "--exclude-from=" path is <REPOSITORY-ROOT>/${EXCLUDE_FILE}
 
-  config file path is REPOSITORY-ROOT/$CONFIG
+  config file path is <REPOSITORY-ROOT>/${CONFIG}
 
   Options:
 

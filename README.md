@@ -45,9 +45,9 @@ $ ryogoku <env> [ref]
 
   default rsync option is "-rlpDvcK --delete"
 
-  default rsync's "--exclude-from=" path is REPOSITORY-ROOT/rsync-exclude
+  default rsync's "--exclude-from=" path is <REPOSITORY-ROOT>/rsync-exclude
 
-  config file path is REPOSITORY-ROOT/ryogoku.conf
+  config file path is <REPOSITORY-ROOT>/ryogoku.conf
 
   Options:
 
