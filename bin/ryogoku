@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.4.5"
+VERSION="0.4.6"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -307,7 +307,6 @@ deploy() {
     src_dir=$TMP
   fi
   src_dir=$(echo $src_dir | sed 's;[^/]$;&/;')
-  echo $src_dir
   test -d "$src_dir" || abort invalid src value: \"${src}\"
 
   # execute rsync
