@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.4.4"
+VERSION="0.4.5"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -278,9 +278,12 @@ deploy() {
   (cd $TMP; git clean -d -f)
 
   local cmd_pre_rsync=$(config_get pre-rsync)
-  log "executing pre-rsync \`$cmd_pre_rsync\`"
-  (cd $TMP; eval $cmd_pre_rsync)
-  test $? -eq 0 || abort pre-rsync failed
+  if test -n "$cmd_pre_rsync"; then
+    log "executing pre-rsync \`$cmd_pre_rsync\`"
+    (cd $TMP; eval $cmd_pre_rsync)
+    test $? -eq 0 || abort pre-rsync failed
+  fi
+
 
   #
   # rsync
