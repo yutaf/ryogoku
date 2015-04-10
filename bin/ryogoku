@@ -265,7 +265,7 @@ deploy() {
 
   # fetch source
   log fetching updates
-  (cd $TMP; git fetch --all)
+  (cd $TMP; git fetch --all --prune)
   test $? -eq 0 || abort fetch failed
 
   # reset HEAD
