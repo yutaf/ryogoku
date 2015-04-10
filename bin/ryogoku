@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.4.2"
+VERSION="0.4.3"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -201,6 +201,7 @@ init() {
 [env]
 user 
 host 
+src 
 path 
 ref 
 rsync-option 
@@ -278,7 +279,9 @@ deploy() {
   (cd $TMP; eval $cmd_pre_rsync)
   test $? -eq 0 || abort pre-rsync failed
 
+  #
   # rsync
+  #
   local rsync_option=$(config_get rsync-option)
   test -n "$rsync_option" && RSYNC_OPTION=$rsync_option
 
@@ -289,13 +292,27 @@ deploy() {
   local exclude_from=
   test -f $EXCLUDE_FILE && exclude_from="--exclude-from=$EXCLUDE_FILE --exclude=$EXCLUDE_FILE"
 
+  # src
+  local src_dir=
+  local src=$(config_get src)
+  if test -n "$src"; then
+    src_dir=${TMP}/$(echo $src | sed 's;^\./;;' | sed 's;^/;;')
+  else
+    src_dir=$TMP
+  fi
+  src_dir=$(echo $src_dir | sed 's;[^/]$;&/;')
+  echo $src_dir
+  test -d "$src_dir" || abort invalid src value: \"${src}\"
+
+  # execute rsync
+  log rsync
+
   if test $DRYRUN -eq 1; then
-    rsync $RSYNC_OPTION --dry-run --exclude=/.deploys --exclude=$CONFIG $exclude_from ${TMP}/ $(get_ssh_list | head -n 1):$path
+    rsync $RSYNC_OPTION --dry-run --exclude=/.deploys --exclude=$CONFIG $exclude_from ${src_dir} $(get_ssh_list | head -n 1):$path
     exit
   fi
 
-  log rsync
-  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % rsync $RSYNC_OPTION --exclude=/.deploys --exclude=$CONFIG $exclude_from ${TMP}/ %:$path
+  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % rsync $RSYNC_OPTION --exclude=/.deploys --exclude=$CONFIG $exclude_from ${src_dir} %:$path
   test $? -eq 0 || abort rsync failed
 
   # deploy log

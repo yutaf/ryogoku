@@ -74,6 +74,7 @@ Locate ryogoku.conf in the git repository root
 [prod]
 user rob
 host 128.199.170.128 128.199.244.193
+src build/
 path /var/www/html
 ref origin/master
 pre-rsync ./bin/pre-rsync
@@ -82,6 +83,7 @@ umask 002
 
 [stage]
 host jimmy@128.199.170.128 jimmy@128.199.244.193
+src build/
 path /var/www/html
 ref origin/develop
 pre-rsync ./bin/pre-rsync
@@ -112,6 +114,11 @@ host deploy@128.199.170.128 john@128.199.244.193
 ```
 
 In this case, You don't need `user` directive.
+
+### src (optional)
+
+directory or file to be rsynced.  
+In other words, rsync's `SRC`
 
 ### path
 
