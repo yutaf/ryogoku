@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.4.6"
+VERSION="0.4.7"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -106,7 +106,8 @@ config_get() {
     && sed -n "${nr_env}, ${nr_next_env}p" $CONFIG \
     | grep "^$key" \
     | head -n 1 \
-    | cut -d ' ' -f 2-
+    | awk '{for (i=2; i<=NF; i++) print $i}'
+#    | cut -d ' ' -f 2-
 }
 
 #
@@ -359,7 +360,7 @@ setup_webhook_ssh() {
   ENV=$CONFIG_SECTION_WEBHOOK
   NEEDS_TTY=1
   for host in $ssh_list; do
-    ssh_command "ssh $host echo; echo Connected to $host"
+    ssh_command "ssh $host echo && echo Connected to $host"
     echo
   done
 }
