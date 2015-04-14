@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.4.7"
+VERSION="0.4.8"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -106,8 +106,7 @@ config_get() {
     && sed -n "${nr_env}, ${nr_next_env}p" $CONFIG \
     | grep "^$key" \
     | head -n 1 \
-    | awk '{for (i=2; i<=NF; i++) print $i}'
-#    | cut -d ' ' -f 2-
+    | cut -s -d ' ' -f 2-
 }
 
 #
