@@ -25,9 +25,7 @@ $ echo 'export PATH=/usr/local/bin:$PATH' >> ~/.bashrc
 $ ryogoku update
 ```
 
-## blog
-
-I wrote a blog post.  
+## How it works
 
 <http://yutaf.github.io/i-made-a-deployment-tool-ryogoku/>
 
