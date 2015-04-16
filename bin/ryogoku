@@ -252,7 +252,6 @@ deploy() {
   if test $? -ne 0; then
     (cd $TMP; git clone $repository .) || abort failed to clone
   fi
-#  test $? -ne 0 && (cd $TMP; git clone $repository .) || abort failed to clone
 
   # check remote url
   local remote_url=$(cd $TMP > /dev/null 2>&1 && git remote -v | grep -m 1 ^origin | cut -f 2 | cut -d ' ' -f 1)
