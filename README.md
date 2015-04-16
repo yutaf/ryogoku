@@ -31,7 +31,7 @@ $ ryogoku update
 
 ## How to use
 
-* Move to the git repository
+* Move to the git repository to deploy
 * Checkout the branch to deploy
 * Create ryogoku.conf in the git repository root.  
 It will be created by this command.
