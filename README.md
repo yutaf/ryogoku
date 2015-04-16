@@ -25,13 +25,14 @@ $ echo 'export PATH=/usr/local/bin:$PATH' >> ~/.bashrc
 $ ryogoku update
 ```
 
-## How it works
+## Blog
 
 <http://yutaf.github.io/i-made-a-deployment-tool-ryogoku/>
 
 ## How to use
 
-* Move to the git repository to deploy
+* Move to the git repository
+* Checkout the branch to deploy
 * Create ryogoku.conf in the git repository root.  
 It will be created by this command.
 
@@ -40,7 +41,6 @@ $ ryogoku init
 ```
 
 * Fill in the ryogoku.conf and commit it
-* Checkout the branch to deploy
 
 then
 
