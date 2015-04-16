@@ -31,9 +31,15 @@ $ ryogoku update
 
 ## How to use
 
-* You need to be inside the git repository to deploy
-* Create ryogoku.conf in git repository root
-* Add `<env>` section to ryogoku.conf
+* Move to the git repository to deploy
+* Create ryogoku.conf in the git repository root.  
+It will be created by this command.
+
+```
+$ ryogoku init
+```
+
+* Fill in the ryogoku.conf and commit it
 * Checkout the branch to deploy
 
 then
