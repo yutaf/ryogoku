@@ -29,24 +29,9 @@ $ ryogoku update
 
 <http://yutaf.github.io/i-made-a-deployment-tool-ryogoku/>
 
-## How to use
+## Getting Started
 
-* Move to the git repository to deploy
-* Checkout the branch to deploy
-* Create ryogoku.conf in the git repository root.  
-It will be created by this command.
-
-```
-$ ryogoku init
-```
-
-* Fill in the ryogoku.conf and commit it
-
-then
-
-```
-$ ryogoku <env> [ref]
-```
+[[Getting Started|Getting-Started]]
 
 ## Usage
 
