@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.4.9"
+VERSION="0.5.0"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -47,6 +47,7 @@ usage() {
     update               update ryogoku to the latest release
     revert [n]           revert to [n]th last deployment or 1
     list                 list previous deploy commits
+    envs                 list all env names
     setup_webhook_ssh    Add webhook public key to deployment host(s)'s authorized_keys
     [ref]                deploys indicated [ref].
 
@@ -217,6 +218,13 @@ EOF
     touch $exclude_file
     log create $exclude_file
   }
+}
+
+#
+# List all env names.
+#
+envs() {
+  grep '^\[[^]]*]$' $CONFIG | sed 's/\[\([^]]*\)\]/\1/g'
 }
 
 #
@@ -399,6 +407,7 @@ while test $# -ne 0; do
     setup_webhook_ssh) require_env; setup_webhook_ssh; exit ;;
     update) update; exit ;;
     init) init; exit ;;
+    envs) envs; exit ;;
     *)
       if test -z "$ENV"; then
         ENV=$arg
