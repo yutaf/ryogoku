@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.4.8"
+VERSION="0.4.9"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -321,7 +321,10 @@ deploy() {
 
   # deploy log
   log "deploy log"
-  local deploy_log=$(cd $TMP && git --no-pager log --date=short --pretty='%h %ad %<(20)%an ● %s' -n 1 $ref)
+  local timestamp=$(git log -n 1 --format="%at")
+  local date=$(perl -e "use POSIX qw(strftime); print strftime( '%Y-%m-%d %H:%M' , localtime($timestamp))")
+  local deploy_log=$(cd $TMP && git --no-pager log -n 1 --pretty="%h $date %<(20)%an ● %s" $ref)
+  #local deploy_log=$(cd $TMP && git --no-pager log -n 1 --date=short --pretty='%h %ad %<(20)%an ● %s' $ref)
   get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh -T % "echo \"$deploy_log\" >> $path/.deploys"
   test $? -eq 0 || warn deploy log append failed
 
