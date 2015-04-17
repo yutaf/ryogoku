@@ -31,7 +31,7 @@ $ ryogoku update
 
 ## Getting Started
 
-[[Getting Started|Getting-Started]]
+<https://github.com/yutaf/ryogoku/wiki/Getting-Started>
 
 ## Usage
 
