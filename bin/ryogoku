@@ -231,8 +231,6 @@ envs() {
 # Deploy [ref].
 #
 deploy() {
-  local ref=$1
-
   if test $DRYRUN -ne 1; then
     log deploying
   else
@@ -252,8 +250,6 @@ deploy() {
   # export
   local umask_value=$(config_get umask)
   test -n "$umask_value" && umask $umask_value
-  test -z "$ref" && ref=origin/$(git rev-parse --abbrev-ref HEAD)
-
   local repository=$(pwd)
   (cd $TMP; git rev-parse 2> /dev/null)
   if test $? -ne 0; then
@@ -275,6 +271,11 @@ deploy() {
   test $? -eq 0 || abort fetch failed
 
   # reset HEAD
+  local ref=$1
+  test -z "$ref" && ref=origin/$(git rev-parse --abbrev-ref HEAD)
+  local ref_inputted=$1
+  ref=$(git rev-parse --short $ref)
+
   log resetting HEAD to $ref
   (cd $TMP; git reset --hard $ref)
   test $? -eq 0 || abort git reset failed
@@ -344,7 +345,7 @@ deploy() {
   fi
 
   # done
-  log successfully deployed $ref
+  log successfully deployed $ref_inputted
 }
 
 #
