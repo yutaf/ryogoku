@@ -196,7 +196,7 @@ update() {
 #
 init() {
   git rev-parse 2> /dev/null || abort not a git repository
-  local config=$(git rev-parse --show-toplevel)/${CONFIG}
+  local config=$(git rev-parse --show-cdup)${CONFIG}
   test -e $config || {
     cat <<-EOF > $config
 [env]
@@ -213,7 +213,7 @@ EOF
     log create $config
   }
 
-  local exclude_file=$(git rev-parse --show-toplevel)/${EXCLUDE_FILE}
+  local exclude_file=$(git rev-parse --show-cdup)${EXCLUDE_FILE}
   test -e $exclude_file || {
     touch $exclude_file
     log create $exclude_file
