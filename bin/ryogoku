@@ -321,11 +321,11 @@ deploy() {
 
   local path=$(config_get path)
   if test $DRYRUN -eq 1; then
-    local command_rsync="rsync $RSYNC_OPTION --dry-run --exclude=/.deploys --exclude=$CONFIG $exclude_from ${src_dir} $(get_ssh_list | head -n 1):$path"
+    local cmd_rsync="rsync $RSYNC_OPTION --dry-run --exclude=/.deploys --exclude=$CONFIG $exclude_from ${src_dir} $(get_ssh_list | head -n 1):$path"
     log dry run
-    echo $command_rsync
+    echo $cmd_rsync
     echo
-    eval $command_rsync
+    eval $cmd_rsync
     exit
   fi
 
