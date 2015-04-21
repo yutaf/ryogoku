@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.5.1"
+VERSION="0.5.2"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -272,7 +272,7 @@ deploy() {
 
   # reset HEAD
   local ref=$1
-  test -z "$ref" && ref=origin/$(git rev-parse --abbrev-ref HEAD)
+  test -z "$ref" && ref=$(git rev-parse --abbrev-ref HEAD)
   local ref_inputted=$1
   ref=$(git rev-parse --short $ref)
 
