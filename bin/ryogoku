@@ -224,7 +224,7 @@ EOF
 # List all env names.
 #
 envs() {
-  grep '^\[[^]]*]$' $CONFIG | sed 's/\[\([^]]*\)\]/\1/g'
+  grep '^\[[^]]*]$' $(git rev-parse --show-cdup)$CONFIG | sed 's/\[\([^]]*\)\]/\1/g'
 }
 
 #
