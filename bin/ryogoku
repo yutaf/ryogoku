@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.5.4"
+VERSION="0.5.5"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -224,7 +224,9 @@ EOF
 # List all env names.
 #
 envs() {
+  set -o pipefail
   grep '^\[[^]]*]$' $(git rev-parse --show-cdup)$CONFIG | sed 's/\[\([^]]*\)\]/\1/g'
+  exit $?
 }
 
 #
