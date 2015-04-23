@@ -275,7 +275,8 @@ deploy() {
   # reset HEAD
   local ref=$1
   test -z "$ref" && ref=$(git rev-parse --abbrev-ref HEAD)
-  local ref_inputted=$1
+  local ref_inputted=$ref
+
   ref=$(git rev-parse --short $ref)
 
   log resetting HEAD to $ref
