@@ -14,9 +14,9 @@ Simple rsync deployment shell script
 
 ## Installation
 
-Clone this repository, and
-
 ```
+$ git clone git://github.com/yutaf/ryogoku.git
+$ cd ryogoku
 $ make install
 ```
 
