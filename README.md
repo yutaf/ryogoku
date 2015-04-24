@@ -68,10 +68,6 @@ $ ryogoku update
     [ref]                deploys indicated [ref].
 ```
 
-## Specific exit status
-
-* `91` ... config section is not defined.
-
 ## License
 
 The MIT License (MIT)
