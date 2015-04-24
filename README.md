@@ -2,6 +2,12 @@
 
 Simple rsync deployment shell script
 
+## Feature
+
+- **Simple** ... minimal configurations and commands
+- **Easy to start** ... don't need any installations on remote
+- **Fast** ... preparing and building sources fast, and send them parallel
+
 ## Requirements
 
 * git
