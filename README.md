@@ -2,7 +2,7 @@
 
 Simple rsync deployment shell script
 
-## Feature
+## Features
 
 - **Simple** ... minimal configurations and commands
 - **Easy to start** ... don't need any installations on remote
