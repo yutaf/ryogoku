@@ -21,6 +21,7 @@ $ make install
 ```
 
 Set path to `/usr/local/bin` if you don't
+
 ```
 $ echo 'export PATH=/usr/local/bin:$PATH' >> ~/.bashrc
 ```
