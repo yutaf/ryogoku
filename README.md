@@ -6,10 +6,6 @@ Simple rsync deployment shell script
 
 <https://github.com/visionmedia/deploy>
 
-## How it works
-
-![How it works](/images/ryogoku-01.png)
-
 ## Features
 
 - **Simple** ... minimal configurations and commands
@@ -47,6 +43,10 @@ $ ryogoku update
 ## Getting Started
 
 <https://github.com/yutaf/ryogoku/wiki/Getting-Started>
+
+## How it works
+
+![How it works](/images/ryogoku-01.png)
 
 ## Usage
 
