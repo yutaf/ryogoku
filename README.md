@@ -2,6 +2,10 @@
 
 Simple rsync deployment shell script
 
+## Forked from
+
+<https://github.com/visionmedia/deploy>
+
 ## Features
 
 - **Simple** ... minimal configurations and commands
