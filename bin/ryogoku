@@ -147,7 +147,7 @@ get_ssh_command() {
 }
 
 #
-# Execute ssh command to only one host.
+# Execute ssh command to one host only.
 #
 ssh_command_single() {
   local url=$(get_ssh_list | head -n 1)
