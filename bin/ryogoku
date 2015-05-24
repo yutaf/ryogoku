@@ -136,7 +136,7 @@ get_ssh_list() {
 #
 # Execute ssh command.
 #
-ssh_command() {
+xargs_command_to_ssh_list() {
   get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % $@
 }
 
@@ -248,7 +248,7 @@ deploy() {
 
   if test $DRYRUN -ne 1; then
     log "check ssh connection"
-    ssh_command ssh -T % :
+    xargs_command_to_ssh_list ssh -T % :
     test $? -eq 0 || abort ssh failed
   fi
 
@@ -340,7 +340,7 @@ deploy() {
     exit
   fi
 
-  ssh_command rsync $RSYNC_OPTION --exclude=/.deploys --exclude=$CONFIG $exclude_from ${src_dir} %:$path
+  xargs_command_to_ssh_list rsync $RSYNC_OPTION --exclude=/.deploys --exclude=$CONFIG $exclude_from ${src_dir} %:$path
   test $? -eq 0 || abort rsync failed
 
   # deploy log
@@ -350,13 +350,13 @@ deploy() {
   local deploy_log=$(git --no-pager log -n 1 --pretty="%h $date %<(20)%an ● %s" $ref)
   #local deploy_log=$(git --no-pager log -n 1 --date=short --pretty='%h %ad %<(20)%an ● %s' $ref)
 
-  ssh_command ssh -T % "echo \"$deploy_log\" >> $path/.deploys"
+  xargs_command_to_ssh_list ssh -T % "echo \"$deploy_log\" >> $path/.deploys"
   test $? -eq 0 || warn deploy log append failed
 
   local cmd_post_deploy=$(config_get post-deploy)
   if test -n "$cmd_post_deploy"; then
     log "executing post-deploy \`$cmd_post_deploy\`"
-    ssh_command ssh -T % "cd $path && eval $cmd_post_deploy"
+    xargs_command_to_ssh_list ssh -T % "cd $path && eval $cmd_post_deploy"
     test $? -eq 0 || abort post-deploy failed
   fi
 
@@ -379,7 +379,7 @@ setup_webhook_ssh() {
 #  ssh_command_single "grep 'StrictHostKeyChecking no' \$HOME/.ssh/config >/dev/null 2>&1 || { echo 'StrictHostKeyChecking no' >> \$HOME/.ssh/config; chmod 600 \$HOME/.ssh/config; }"
 
   ENV=$env
-  ssh_command ssh -T % "grep '$webhook_public_key' \$HOME/.ssh/authorized_keys >/dev/null 2>&1 || echo $webhook_public_key >> \$HOME/.ssh/authorized_keys"
+  xargs_command_to_ssh_list ssh -T % "grep '$webhook_public_key' \$HOME/.ssh/authorized_keys >/dev/null 2>&1 || echo $webhook_public_key >> \$HOME/.ssh/authorized_keys"
   test $? -eq 0 || abort failed to add webhook public key to authorized_keys
 
   local ssh_list=$(get_ssh_list)
