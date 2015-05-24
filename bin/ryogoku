@@ -10,7 +10,6 @@ EXCLUDE_FILE=rsync-exclude
 RSYNC_OPTION="-rlpDvcK --delete"
 DRYRUN=0
 PARALLEL=10
-NEEDS_TTY=0
 
 CONFIG_SECTION_WEBHOOK=webhook
 EXIT_STATUS_CONFIG_SECTION_NOT_DEFINED=91
@@ -147,10 +146,11 @@ ssh_command_single() {
   local url=$(get_ssh_list | head -n 1)
   local forward_agent="`config_get forward-agent`"
   local port="`config_get port`"
+  local needs_tty="`config_get needs_tty`"
 
   test -n "$forward_agent" && local agent="-A"
   test -n "$port" && local port="-p $port"
-  test $NEEDS_TTY -eq 1 && local tty="-t"
+  test -n "$needs_tty" && local tty="-t"
 
   ssh $tty $agent $port $url $@
 }
@@ -384,7 +384,6 @@ setup_webhook_ssh() {
 
   local ssh_list=$(get_ssh_list)
   ENV=$CONFIG_SECTION_WEBHOOK
-  NEEDS_TTY=1
   for host in $ssh_list; do
     ssh_command_single "ssh $host echo && echo Connected to $host"
     echo
