@@ -48,6 +48,7 @@ usage() {
     list                 list previous deploy commits
     envs                 list all env names
     setup_webhook_ssh    Add webhook public key to deployment host(s)'s authorized_keys
+    ssh_command <cmd>    Execute ssh command
     [ref]                deploys indicated [ref].
 
 EOF
@@ -152,6 +153,13 @@ get_ssh_command() {
 ssh_command_single() {
   local url=$(get_ssh_list | head -n 1)
   ssh $(get_ssh_options) $url $@
+}
+
+#
+# Execute ssh command.
+#
+ssh_command() {
+  xargs_command_to_ssh_list $(get_ssh_command) % "$@"
 }
 
 #
@@ -445,6 +453,7 @@ while test $# -ne 0; do
     update) update; exit ;;
     init) init; exit ;;
     envs) envs; exit ;;
+    ssh_command) ssh_command $@; exit ;;
     *)
       if test -z "$ENV"; then
         ENV=$arg
