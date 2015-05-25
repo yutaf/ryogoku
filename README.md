@@ -74,7 +74,8 @@ $ ryogoku update
     list                 list previous deploy commits
     envs                 list all env names
     setup_webhook_ssh    Add webhook public key to deployment host(s)'s authorized_keys
-    [ref]                deploys indicated [ref].
+    ssh_command <cmd>    Execute command via ssh to all the hosts
+    [ref]                deploy indicated [ref]
 ```
 
 ## License
