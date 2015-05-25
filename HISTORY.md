@@ -1,6 +1,10 @@
+## 0.5.8 / 2015-05-25
+
+  * Add 'ssh_command_single'
+
 ## 0.5.7 / 2015-05-24
 
-  * Add ssh_command
+  * Add 'ssh_command'
 
 ## 0.5.6 / 2015-05-21
 

@@ -61,21 +61,22 @@ $ ryogoku update
 
   Options:
 
-    -V, --version        output program versions
-    -h, --help           output help information
-    -n, --dry-run        show what would have been transferred
-    -P <n>               Set max number of parallel execution. default: 10
+    -V, --version             output program versions
+    -h, --help                output help information
+    -n, --dry-run             show what would have been transferred
+    -P <n>                    Set max number of parallel execution. default: 10
 
   Commands:
 
-    init                 create config files
-    update               update ryogoku to the latest release
-    revert [n]           revert to [n]th last deployment or 1
-    list                 list previous deploy commits
-    envs                 list all env names
-    setup_webhook_ssh    Add webhook public key to deployment host(s)'s authorized_keys
-    ssh_command <cmd>    Execute command via ssh to all the hosts
-    [ref]                deploy indicated [ref]
+    init                      create config files
+    update                    update ryogoku to the latest release
+    revert [n]                revert to [n]th last deployment or 1
+    list                      list previous deploy commits
+    envs                      list all env names
+    setup_webhook_ssh         Add webhook public key to deployment host(s)'s authorized_keys
+    ssh_command <cmd>         Execute command via ssh to all the env hosts
+    ssh_command_single <cmd>  Execute command via ssh to one env host only
+    [ref]                     deploy indicated [ref]
 ```
 
 ## License
