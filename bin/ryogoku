@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.5.8"
+VERSION="0.5.9"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -11,7 +11,6 @@ RSYNC_OPTION="-rlpDvcK --delete"
 DRYRUN=0
 PARALLEL=10
 
-CONFIG_SECTION_WEBHOOK=webhook
 EXIT_STATUS_CONFIG_SECTION_NOT_DEFINED=91
 
 RED=31
@@ -47,7 +46,7 @@ usage() {
     revert [n]                revert to [n]th last deployment or 1
     list                      list previous deploy commits
     envs                      list all env names
-    setup_webhook_ssh         Add webhook public key to deployment host(s)'s authorized_keys
+    setup_remote_ssh <env>    Add remote env's public key to deployment host(s)'s authorized_keys
     ssh_command <cmd>         Execute command via ssh to all the env hosts
     ssh_command_single <cmd>  Execute command via ssh to one env host only
     [ref]                     deploy indicated [ref]
@@ -381,27 +380,33 @@ deploy() {
 }
 
 #
-# Add webhook public key to authorized_keys of deployment host(s).
+# Add remote env's public key to deployment host(s)'s authorized_keys
 #
-setup_webhook_ssh() {
+setup_remote_ssh() {
   local env=$ENV
+  local env_remote=$1
+  test -z "$env_remote" && abort please pass the remote \<env\>
 
-  ENV=$CONFIG_SECTION_WEBHOOK
+  ENV=$env_remote
   require_env
   # get public key
-  local webhook_public_key=$(ssh_command_single "cat \$HOME/.ssh/id_rsa.pub")
-  test -z "$webhook_public_key" && abort failed to get webhook public key
+  local remote_public_key_path=$(config_get key)
+  test -z "$remote_public_key_path" && remote_public_key_path='$HOME/.ssh/id_rsa.pub'
+  local remote_public_key=$(ssh_command_single cat $remote_public_key_path)
+
+  test -z "$remote_public_key" && abort failed to get webhook public key
   # disable known_hosts check
 #  ssh_command_single "grep 'StrictHostKeyChecking no' \$HOME/.ssh/config >/dev/null 2>&1 || { echo 'StrictHostKeyChecking no' >> \$HOME/.ssh/config; chmod 600 \$HOME/.ssh/config; }"
 
   ENV=$env
-  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % "grep '$webhook_public_key' \$HOME/.ssh/authorized_keys >/dev/null 2>&1 || echo $webhook_public_key >> \$HOME/.ssh/authorized_keys"
+  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % "grep '$remote_public_key' \$HOME/.ssh/authorized_keys >/dev/null 2>&1 || echo $remote_public_key >> \$HOME/.ssh/authorized_keys"
   test $? -eq 0 || abort failed to add webhook public key to authorized_keys
 
   local ssh_list=$(get_ssh_list)
-  ENV=$CONFIG_SECTION_WEBHOOK
+  ENV=$env_remote
   for host in $ssh_list; do
     ssh_command_single "ssh $host echo && echo Connected to $host"
+    test $? -eq 0 || abort [$ENV] failed to ssh to $host
     echo
   done
 }
@@ -437,6 +442,7 @@ while test $# -ne 0; do
     revert) require_env; revert_to ${1:-1}; exit ;;
     list) require_env; list_deploys; exit ;;
     setup_webhook_ssh) require_env; setup_webhook_ssh; exit ;;
+    setup_remote_ssh) require_env; setup_remote_ssh $@; exit ;;
     update) update; exit ;;
     init) init; exit ;;
     envs) envs; exit ;;

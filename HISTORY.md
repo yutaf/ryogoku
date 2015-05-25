@@ -1,3 +1,7 @@
+## 0.5.9 / 2015-05-25
+
+  * Update 'setup_webhook_ssh' to 'setup_remote_ssh'
+
 ## 0.5.8 / 2015-05-25
 
   * Add 'ssh_command_single'
