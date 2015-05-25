@@ -48,7 +48,7 @@ usage() {
     list                 list previous deploy commits
     envs                 list all env names
     setup_webhook_ssh    Add webhook public key to deployment host(s)'s authorized_keys
-    ssh_command <cmd>    Execute ssh command
+    ssh_command <cmd>    Execute command via ssh to all the hosts
     [ref]                deploys indicated [ref].
 
 EOF
@@ -134,32 +134,18 @@ get_ssh_list() {
 }
 
 #
-# Execute command with xargs to each hosts in ssh list.
+# Execute command via ssh to all the hosts.
 #
-xargs_command_to_ssh_list() {
-  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % "$@"
+ssh_command() {
+  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % "$@"
 }
 
 #
-# Get ssh command.
-#
-get_ssh_command() {
-  echo ssh $(get_ssh_options)
-}
-
-#
-# Execute ssh command to one host only.
+# Execute command via ssh to one host only.
 #
 ssh_command_single() {
   local url=$(get_ssh_list | head -n 1)
   ssh $(get_ssh_options) $url $@
-}
-
-#
-# Execute ssh command.
-#
-ssh_command() {
-  xargs_command_to_ssh_list $(get_ssh_command) % "$@"
 }
 
 #
@@ -274,7 +260,7 @@ deploy() {
 
   if test $DRYRUN -ne 1; then
     log "check ssh connection"
-    xargs_command_to_ssh_list $(get_ssh_command) % :
+    get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % :
     test $? -eq 0 || abort ssh failed
   fi
 
@@ -369,7 +355,7 @@ deploy() {
     exit
   fi
 
-  xargs_command_to_ssh_list rsync $RSYNC_OPTION --exclude=/.deploys --exclude=$CONFIG $exclude_from ${src_dir} %:$path
+  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % rsync $RSYNC_OPTION --exclude=/.deploys --exclude=$CONFIG $exclude_from ${src_dir} %:$path
   test $? -eq 0 || abort rsync failed
 
   # deploy log
@@ -379,13 +365,13 @@ deploy() {
   local deploy_log=$(git --no-pager log -n 1 --pretty="%h $date %<(20)%an ● %s" $ref)
   #local deploy_log=$(git --no-pager log -n 1 --date=short --pretty='%h %ad %<(20)%an ● %s' $ref)
 
-  xargs_command_to_ssh_list $(get_ssh_command) % "echo \"$deploy_log\" >> $path/.deploys"
+  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % "echo \"$deploy_log\" >> $path/.deploys"
   test $? -eq 0 || warn deploy log append failed
 
   local cmd_post_deploy=$(config_get post-deploy)
   if test -n "$cmd_post_deploy"; then
     log "executing post-deploy \`$cmd_post_deploy\`"
-    xargs_command_to_ssh_list $(get_ssh_command) % "cd $path && eval $cmd_post_deploy"
+    get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % "cd $path && eval $cmd_post_deploy"
     test $? -eq 0 || abort post-deploy failed
   fi
 
@@ -408,7 +394,7 @@ setup_webhook_ssh() {
 #  ssh_command_single "grep 'StrictHostKeyChecking no' \$HOME/.ssh/config >/dev/null 2>&1 || { echo 'StrictHostKeyChecking no' >> \$HOME/.ssh/config; chmod 600 \$HOME/.ssh/config; }"
 
   ENV=$env
-  xargs_command_to_ssh_list $(get_ssh_command) % "grep '$webhook_public_key' \$HOME/.ssh/authorized_keys >/dev/null 2>&1 || echo $webhook_public_key >> \$HOME/.ssh/authorized_keys"
+  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % "grep '$webhook_public_key' \$HOME/.ssh/authorized_keys >/dev/null 2>&1 || echo $webhook_public_key >> \$HOME/.ssh/authorized_keys"
   test $? -eq 0 || abort failed to add webhook public key to authorized_keys
 
   local ssh_list=$(get_ssh_list)
