@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.5.9"
+VERSION="0.6.0"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -252,17 +252,19 @@ envs() {
 # Deploy [ref].
 #
 deploy() {
-  if test $DRYRUN -ne 1; then
-    log deploying
-  else
+  if test $DRYRUN -eq 1; then
     log DRYRUN MODE
+  else
+    log deploying
   fi
 
-  if test $DRYRUN -ne 1; then
-    log "check ssh connection"
+  log "check ssh connection"
+  if test $DRYRUN -eq 1; then
+    ssh_command_single :
+  else
     get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % :
-    test $? -eq 0 || abort ssh failed
   fi
+  test $? -eq 0 || abort ssh failed
 
   # make TMP directory
   TMP=/var/tmp/ryogoku/$(basename $(pwd))

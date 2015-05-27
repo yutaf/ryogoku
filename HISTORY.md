@@ -1,3 +1,7 @@
+## 0.6.0 / 2015-05-27
+
+  * Check ssh connection on dry mode
+
 ## 0.5.9 / 2015-05-25
 
   * Update 'setup_webhook_ssh' to 'setup_remote_ssh'
