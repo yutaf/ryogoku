@@ -23,7 +23,6 @@ BLUE=34
 #
 usage() {
   cat <<-EOF
-
   Usage: ryogoku [options] <env> [command]
 
   * default rsync option is "$RSYNC_OPTION"
@@ -47,7 +46,6 @@ usage() {
     revert [n]                revert to [n]th last deployment or 1
     list                      list previous deploy commits
     setup_remote_ssh <env>    Add remote env's public key to deployment host(s)'s authorized_keys
-
 EOF
 }
 
