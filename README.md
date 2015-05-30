@@ -74,8 +74,6 @@ $ ryogoku update
     revert [n]                revert to [n]th last deployment or 1
     list                      list previous deploy commits
     setup_remote_ssh <env>    Add remote env's public key to deployment host(s)'s authorized_keys
-    ssh_command <cmd>         Execute command via ssh to all the env hosts
-    ssh_command_single <cmd>  Execute command via ssh to one env host only
 ```
 
 ## License
