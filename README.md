@@ -53,11 +53,9 @@ $ ryogoku update
 ```
   Usage: ryogoku [options] <env> [command]
 
-  default rsync option is "-rlpDvcK --delete"
-
-  default rsync's "--exclude-from=" path is <REPOSITORY-ROOT>/rsync-exclude
-
-  config file path is <REPOSITORY-ROOT>/ryogoku.conf
+  * default rsync option is "-rlpDvcK --delete"
+  * default rsync's "--exclude-from=" path is REPOSITORY-ROOT/rsync-exclude
+  * config file path is REPOSITORY-ROOT/ryogoku.conf
 
   Options:
 
@@ -70,13 +68,14 @@ $ ryogoku update
 
     init                      create config files
     update                    update ryogoku to the latest release
+    envs                      list all env names
+
+    [ref]                     deploy indicated [ref]
     revert [n]                revert to [n]th last deployment or 1
     list                      list previous deploy commits
-    envs                      list all env names
     setup_remote_ssh <env>    Add remote env's public key to deployment host(s)'s authorized_keys
     ssh_command <cmd>         Execute command via ssh to all the env hosts
     ssh_command_single <cmd>  Execute command via ssh to one env host only
-    [ref]                     deploy indicated [ref]
 ```
 
 ## License
