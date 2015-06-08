@@ -1,4 +1,4 @@
-## 0.6.0 / 2015-05-27
+## 0.6.1 / 2015-05-27
 
   * Add 'execute_in_current_dir' directive
 
