@@ -1,4 +1,8 @@
-## 0.6.1 / 2015-05-27
+## 0.6.2 / 2015-06-08
+
+  * Add '-p, --path' option
+
+## 0.6.1 / 2015-06-08
 
   * Add 'execute_in_current_dir' directive
 

@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
-VERSION="0.6.1"
+VERSION="0.6.2"
 CONFIG=ryogoku.conf
 ENV=
 REF=
 TMP=
+PATH_VAR=
 EXCLUDE_FILE=rsync-exclude
 # -u (--update) is not good for rollback
 RSYNC_OPTION="-rlpDvcK --delete"
@@ -34,6 +35,7 @@ usage() {
     -V, --version             output program versions
     -h, --help                output help information
     -n, --dry-run             show what would have been transferred
+    -p, --path <path>         specify path value
     -P <n>                    Set max number of parallel execution. default: $PARALLEL
 
   Commands:
@@ -167,7 +169,11 @@ get_ssh_options(){
 #
 nth_deploy_commit() {
   local n=$1
-  local path=`config_get path`
+  if test -n "$PATH_VAR"; then
+    local path=$PATH_VAR
+  else
+    local path=$(config_get path)
+  fi
   ssh_command_single "nl $path/.deploys | sort -nr | awk -v n=$n 'NR==n { print \$2 }'"
 }
 
@@ -186,7 +192,11 @@ revert_to() {
 # List deploys.
 #
 list_deploys() {
-  local path=`config_get path`
+  if test -n "$PATH_VAR"; then
+    local path=$PATH_VAR
+  else
+    local path=$(config_get path)
+  fi
   ssh_command_single "nl $path/.deploys | sort -nr | cut -f 2-"
 }
 
@@ -355,7 +365,12 @@ deploy() {
   # execute rsync
   log rsync
 
-  local path=$(config_get path)
+  if test -n "$PATH_VAR"; then
+    local path=$PATH_VAR
+  else
+    local path=$(config_get path)
+  fi
+
   if test $DRYRUN -eq 1; then
     local cmd_rsync="rsync $RSYNC_OPTION --dry-run --exclude=/.deploys --exclude=$CONFIG $exclude_from ${src_dir} $(get_ssh_list | head -n 1):$path"
     log dry run
@@ -448,6 +463,7 @@ while test $# -ne 0; do
     -h|--help) usage; exit ;;
     -V|--version) version; exit ;;
     -n|--dry-run) DRYRUN=1 ;;
+    -p|--path) PATH_VAR=$1; shift;;
     -P) PARALLEL=$1; shift;;
     revert) require_env; revert_to ${1:-1}; exit ;;
     list) require_env; list_deploys; exit ;;

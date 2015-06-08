@@ -62,6 +62,7 @@ $ ryogoku update
     -V, --version             output program versions
     -h, --help                output help information
     -n, --dry-run             show what would have been transferred
+    -p, --path <path>         specify path value
     -P <n>                    Set max number of parallel execution. default: 10
 
   Commands:
