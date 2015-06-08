@@ -438,7 +438,6 @@ while test $# -ne 0; do
     -P) PARALLEL=$1; shift;;
     revert) require_env; revert_to ${1:-1}; exit ;;
     list) require_env; list_deploys; exit ;;
-    setup_webhook_ssh) require_env; setup_webhook_ssh; exit ;;
     setup_remote_ssh) require_env; setup_remote_ssh $@; exit ;;
     update) update; exit ;;
     init) init; exit ;;
