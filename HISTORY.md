@@ -1,5 +1,9 @@
 ## 0.6.0 / 2015-05-27
 
+  * Add 'execute_in_current_dir' directive
+
+## 0.6.0 / 2015-05-27
+
   * Check ssh connection on dry mode
 
 ## 0.5.9 / 2015-05-25
