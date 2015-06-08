@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.6.0"
+VERSION="0.6.1"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -261,34 +261,44 @@ deploy() {
   fi
   test $? -eq 0 || abort ssh failed
 
-  # make TMP directory
-  TMP=/var/tmp/ryogoku/$(basename $(pwd))
-  test -d "$TMP" || mkdir -p $TMP
+  local execute_in_current_dir=$(config_get execute_in_current_dir)
 
-  # export
-  local umask_value=$(config_get umask)
-  test -n "$umask_value" && umask $umask_value
-  local repository=$(pwd)
-  (cd $TMP; git rev-parse 2> /dev/null)
-  if test $? -ne 0; then
-    (cd $TMP; git clone $repository .) || abort failed to clone
+  # set TMP
+  if test -z "$execute_in_current_dir"; then
+    TMP=/var/tmp/ryogoku/$(basename $(pwd))
+  else
+    TMP=.
   fi
 
-  # check remote url
-  local remote_url=$(cd $TMP > /dev/null 2>&1 && git remote -v | grep -m 1 ^origin | cut -f 2 | cut -d ' ' -f 1)
-  if test "$repository" != "$remote_url"; then
-    log working directory path changed. clone again from the new path.
-    rm -rf $TMP
-    mkdir -p $TMP
-    (cd $TMP; git clone $repository .) || abort failed to clone
+  if test -z "$execute_in_current_dir"; then
+    # make TMP directory
+    test -d "$TMP" || mkdir -p $TMP
+
+    # export
+    local umask_value=$(config_get umask)
+    test -n "$umask_value" && umask $umask_value
+    local repository=$(pwd)
+    (cd $TMP; git rev-parse 2> /dev/null)
+    if test $? -ne 0; then
+      (cd $TMP; git clone $repository .) || abort failed to clone
+    fi
+
+    # check remote url
+    local remote_url=$(cd $TMP > /dev/null 2>&1 && git remote -v | grep -m 1 ^origin | cut -f 2 | cut -d ' ' -f 1)
+    if test "$repository" != "$remote_url"; then
+      log working directory path changed. clone again from the new path.
+      rm -rf $TMP
+      mkdir -p $TMP
+      (cd $TMP; git clone $repository .) || abort failed to clone
+    fi
+
+    # fetch source
+    log fetching updates
+    (cd $TMP; git fetch --all --prune)
+    test $? -eq 0 || abort fetch failed
   fi
 
-  # fetch source
-  log fetching updates
-  (cd $TMP; git fetch --all --prune)
-  test $? -eq 0 || abort fetch failed
-
-  # reset HEAD
+  # set ref
   local ref=$1
   test -z "$ref" && ref=$(git rev-parse --abbrev-ref HEAD)
   local ref_inputted=$ref
@@ -296,9 +306,12 @@ deploy() {
   ref=$(git rev-parse --short $ref)
   test $? -eq 0 || abort invalid ref \`$ref_inputted\`
 
-  log resetting HEAD to $ref
-  (cd $TMP; git reset --hard $ref)
-  test $? -eq 0 || abort git reset failed
+  if test -z "$execute_in_current_dir"; then
+    # reset HEAD
+    log resetting HEAD to $ref
+    (cd $TMP; git reset --hard $ref)
+    test $? -eq 0 || abort git reset failed
+  fi
 
   # clean
   log clean
