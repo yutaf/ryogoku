@@ -1,3 +1,8 @@
+## 0.6.3 / 2015-06-09
+
+  * Add '--current' option
+  * Add '--discard' option
+
 ## 0.6.2 / 2015-06-08
 
   * Add '-p, --path' option
