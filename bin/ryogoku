@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.6.2"
+VERSION="0.6.3"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -10,6 +10,7 @@ EXCLUDE_FILE=rsync-exclude
 # -u (--update) is not good for rollback
 RSYNC_OPTION="-rlpDvcK --delete"
 DRYRUN=0
+CURRENT=0
 PARALLEL=10
 
 EXIT_STATUS_CONFIG_SECTION_NOT_DEFINED=91
@@ -35,6 +36,7 @@ usage() {
     -V, --version             output program versions
     -h, --help                output help information
     -n, --dry-run             show what would have been transferred
+    --current                 execute whole deployment process in current directory
     -p, --path <path>         specify path value
     -P <n>                    Set max number of parallel execution. default: $PARALLEL
 
@@ -271,16 +273,18 @@ deploy() {
   fi
   test $? -eq 0 || abort ssh failed
 
-  local execute_in_current_dir=$(config_get execute_in_current_dir)
-
-  # set TMP
-  if test -z "$execute_in_current_dir"; then
-    TMP=/var/tmp/ryogoku/$(basename $(pwd))
-  else
-    TMP=.
+  if test $CURRENT -ne 1 -a -n "$(config_get execute_in_current_dir)"; then
+    CURRENT=1
   fi
 
-  if test -z "$execute_in_current_dir"; then
+  # set TMP
+  if test $CURRENT -eq 1; then
+    TMP=.
+  else
+    TMP=/var/tmp/ryogoku/$(basename $(pwd))
+  fi
+
+  if test $CURRENT -ne 1; then
     # make TMP directory
     test -d "$TMP" || mkdir -p $TMP
 
@@ -316,7 +320,7 @@ deploy() {
   ref=$(git rev-parse --short $ref)
   test $? -eq 0 || abort invalid ref \`$ref_inputted\`
 
-  if test -z "$execute_in_current_dir"; then
+  if test $CURRENT -ne 1; then
     # reset HEAD
     log resetting HEAD to $ref
     (cd $TMP; git reset --hard $ref)
@@ -463,6 +467,7 @@ while test $# -ne 0; do
     -h|--help) usage; exit ;;
     -V|--version) version; exit ;;
     -n|--dry-run) DRYRUN=1 ;;
+    --current) CURRENT=1 ;;
     -p|--path) PATH_VAR=$1; shift;;
     -P) PARALLEL=$1; shift;;
     revert) require_env; revert_to ${1:-1}; exit ;;
