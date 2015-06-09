@@ -62,6 +62,8 @@ $ ryogoku update
     -V, --version             output program versions
     -h, --help                output help information
     -n, --dry-run             show what would have been transferred
+    --current                 execute whole deployment process in current directory
+    --discard                 delete path post deployment
     -p, --path <path>         specify path value
     -P <n>                    Set max number of parallel execution. default: 10
 
