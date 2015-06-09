@@ -316,12 +316,14 @@ deploy() {
   fi
 
   # set ref
-  local ref=$1
-  test -z "$ref" && ref=$(git rev-parse --abbrev-ref HEAD)
-  local ref_inputted=$ref
+  local ref_arg=$1
+  if test -z "$ref_arg"; then
+    # fetch branch name
+    ref_arg=$(git rev-parse --abbrev-ref HEAD)
+  fi
 
-  ref=$(git rev-parse --short $ref)
-  test $? -eq 0 || abort invalid ref \`$ref_inputted\`
+  ref=$(git rev-parse --short $ref_arg)
+  test $? -eq 0 || abort invalid ref \`$ref_arg\`
 
   if test $CURRENT -ne 1; then
     # reset HEAD
@@ -413,7 +415,7 @@ deploy() {
   fi
 
   # done
-  log successfully deployed $ref_inputted
+  log successfully deployed $ref
   exit 0
 }
 
@@ -501,9 +503,10 @@ done
 
 # move to repository root
 cd $(git rev-parse --show-toplevel)
+pwd
 
 require_env
 check_for_local_changes
 
 # deploy
-deploy "${REF:-`config_get ref`}"
+deploy "${REF:-$(config_get ref)}"
