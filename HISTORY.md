@@ -2,6 +2,7 @@
 
   * Add '--current' option
   * Add '--discard' option
+  * Add 'config_get' command
 
 ## 0.6.2 / 2015-06-08
 
