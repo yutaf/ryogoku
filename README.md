@@ -53,7 +53,7 @@ $ ryogoku update
 ```
   Usage: ryogoku [options] <env> [command]
 
-  * default rsync option is "-rlpDvcK --delete"
+  * default rsync option is "-rlpDvcK --delete --safe-links"
   * default rsync's "--exclude-from=" path is REPOSITORY-ROOT/rsync-exclude
   * config file path is REPOSITORY-ROOT/ryogoku.conf
 
@@ -62,10 +62,10 @@ $ ryogoku update
     -V, --version             output program versions
     -h, --help                output help information
     -n, --dry-run             show what would have been transferred
-    --current                 execute whole deployment process in current directory
-    --discard                 delete path post deployment
+    --discard                 delete destination path post deployment
     -p, --path <path>         specify path value
     -P <n>                    Set max number of parallel execution. default: 10
+    --current                 use currnet directory as deployment source instead of cloned temporary directory
 
   Commands:
 
@@ -76,6 +76,7 @@ $ ryogoku update
     [ref]                     deploy indicated [ref]
     revert [n]                revert to [n]th last deployment or 1
     list                      list previous deploy commits
+    config_get <directive>    print specified config value
     setup_remote_ssh <env>    Add remote env's public key to deployment host(s)'s authorized_keys
 ```
 
