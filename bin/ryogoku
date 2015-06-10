@@ -391,7 +391,7 @@ deploy() {
 
   if test $DISCARD -eq 1; then
     # Handle Script Errors.
-    trap "log discard deployed && ssh_command rm -rf $path" EXIT
+    trap "log discard deployed destination && ssh_command rm -rf $path" EXIT
   fi
 
   get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % rsync $RSYNC_OPTION --exclude=/.deploys --exclude=$CONFIG $exclude_from ${src_dir} %:$path
