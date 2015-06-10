@@ -37,10 +37,10 @@ usage() {
     -V, --version             output program versions
     -h, --help                output help information
     -n, --dry-run             show what would have been transferred
-    --current                 execute whole deployment process in current directory
-    --discard                 delete path post deployment
+    --discard                 delete destination path post deployment
     -p, --path <path>         specify path value
     -P <n>                    Set max number of parallel execution. default: $PARALLEL
+    --current                 use currnet directory as deployment source instead of cloned temporary directory
 
   Commands:
 
