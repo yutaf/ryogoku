@@ -8,7 +8,7 @@ TMP=
 PATH_VAR=
 EXCLUDE_FILE=rsync-exclude
 # -u (--update) is not good for rollback
-RSYNC_OPTION="-rlpDvcK --delete"
+RSYNC_OPTION="-rlpDvcK --delete --safe-links"
 DRYRUN=0
 CURRENT=0
 DISCARD=0
