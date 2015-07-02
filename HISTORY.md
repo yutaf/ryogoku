@@ -1,3 +1,7 @@
+## 0.7.0 / 2015-07-02
+
+  * Add 'pre-deploy' directive
+
 ## 0.6.3 / 2015-06-09
 
   * Add '--current' option

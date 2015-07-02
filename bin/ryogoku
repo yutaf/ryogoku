@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.6.3"
+VERSION="0.7.0"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -236,6 +236,7 @@ path
 ref 
 rsync-option 
 pre-rsync 
+pre-deploy 
 post-deploy 
 umask 
 EOF
@@ -351,6 +352,22 @@ deploy() {
     test $? -eq 0 || abort pre-rsync failed
   fi
 
+  # pre-deploy
+  local cmd_pre_deploy=$(config_get pre-deploy)
+  if test -n "$cmd_pre_deploy"; then
+    log "executing pre-deploy \`$cmd_pre_deploy\`"
+
+    local cmd_pre_deploy_exe=
+
+    for str in $cmd_pre_deploy; do
+      local cmd=$str
+      test -x "$str" && cmd="$(cat $str)"
+      cmd_pre_deploy_exe=${cmd_pre_deploy_exe}" "${cmd}
+    done
+
+    get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % "cd $path && eval \"$cmd_pre_deploy_exe\""
+    test $? -eq 0 || abort pre-deploy failed
+  fi
 
   #
   # rsync
