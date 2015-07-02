@@ -353,20 +353,22 @@ deploy() {
   fi
 
   # pre-deploy
-  local cmd_pre_deploy=$(config_get pre-deploy)
-  if test -n "$cmd_pre_deploy"; then
-    log "executing pre-deploy \`$cmd_pre_deploy\`"
+  if test $DRYRUN -ne 1; then
+    local cmd_pre_deploy=$(config_get pre-deploy)
+    if test -n "$cmd_pre_deploy"; then
+      log "executing pre-deploy \`$cmd_pre_deploy\`"
 
-    local cmd_pre_deploy_exe=
+      local cmd_pre_deploy_exe=
 
-    for str in $cmd_pre_deploy; do
-      local cmd=$str
-      test -x "$str" && cmd="$(cat $str)"
-      cmd_pre_deploy_exe=${cmd_pre_deploy_exe}" "${cmd}
-    done
+      for str in $cmd_pre_deploy; do
+        local cmd=$str
+        test -x "$str" && cmd="$(cat $str)"
+        cmd_pre_deploy_exe=${cmd_pre_deploy_exe}" "${cmd}
+      done
 
-    get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % "cd $path && eval \"$cmd_pre_deploy_exe\""
-    test $? -eq 0 || abort pre-deploy failed
+      get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % "cd $path && eval \"$cmd_pre_deploy_exe\""
+      test $? -eq 0 || abort pre-deploy failed
+    fi
   fi
 
   #
