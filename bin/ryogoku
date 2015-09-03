@@ -287,38 +287,39 @@ deploy() {
     CURRENT=1
   fi
 
-  # set TMP
+  # set tmp
+  local tmp=
   if test $CURRENT -eq 1; then
-    TMP=.
+    tmp=.
   else
-    TMP=/var/tmp/ryogoku/$(basename $(pwd))
+    tmp=/var/tmp/ryogoku/$(basename $(pwd))
   fi
 
   if test $CURRENT -ne 1; then
-    # make TMP directory
-    test -d "$TMP" || mkdir -p $TMP
+    # create tmp
+    test -d "$tmp" || mkdir -p $tmp
 
     # export
     local umask_value=$(config_get umask)
     test -n "$umask_value" && umask $umask_value
     local repository=$(pwd)
-    (cd $TMP; git rev-parse 2> /dev/null)
+    (cd $tmp; git rev-parse 2> /dev/null)
     if test $? -ne 0; then
-      (cd $TMP; git clone $repository .) || abort failed to clone
+      (cd $tmp; git clone $repository .) || abort failed to clone
     fi
 
     # check remote url
-    local remote_url=$(cd $TMP > /dev/null 2>&1 && git remote -v | grep -m 1 ^origin | cut -f 2 | cut -d ' ' -f 1)
+    local remote_url=$(cd $tmp > /dev/null 2>&1 && git remote -v | grep -m 1 ^origin | cut -f 2 | cut -d ' ' -f 1)
     if test "$repository" != "$remote_url"; then
       log working directory path changed. clone again from the new path.
-      rm -rf $TMP
-      mkdir -p $TMP
-      (cd $TMP; git clone $repository .) || abort failed to clone
+      rm -rf $tmp
+      mkdir -p $tmp
+      (cd $tmp; git clone $repository .) || abort failed to clone
     fi
 
     # fetch source
     log fetching updates
-    (cd $TMP; git fetch --all --prune)
+    (cd $tmp; git fetch --all --prune)
     test $? -eq 0 || abort fetch failed
   fi
 
@@ -335,19 +336,19 @@ deploy() {
   if test $CURRENT -ne 1; then
     # reset HEAD
     log resetting HEAD to $ref
-    (cd $TMP; git reset --hard $ref)
+    (cd $tmp; git reset --hard $ref)
     test $? -eq 0 || abort git reset failed
   fi
 
   # clean
   log clean
-  (cd $TMP; git clean -d -f)
+  (cd $tmp; git clean -d -f)
 
   # pre-rsync
   local cmd_pre_rsync=$(config_get pre-rsync)
   if test -n "$cmd_pre_rsync"; then
     log "executing pre-rsync \`$cmd_pre_rsync\`"
-    (cd $TMP; eval $cmd_pre_rsync)
+    (cd $tmp; eval $cmd_pre_rsync)
     test $? -eq 0 || abort pre-rsync failed
   fi
 
@@ -387,9 +388,9 @@ deploy() {
   local src_dir=
   local src=$(config_get src)
   if test -n "$src"; then
-    src_dir=${TMP}/$(echo $src | sed 's;^\./;;' | sed 's;^/;;')
+    src_dir=${tmp}/$(echo $src | sed 's;^\./;;' | sed 's;^/;;')
   else
-    src_dir=$TMP
+    src_dir=$tmp
   fi
   src_dir=$(echo $src_dir | sed 's;[^/]$;&/;')
   test -d "$src_dir" || abort invalid src value: \"${src}\"
