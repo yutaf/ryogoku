@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="0.7.0"
+VERSION="1.0.0"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -292,7 +292,10 @@ deploy() {
   if test $CURRENT -eq 1; then
     tmp=.
   else
-    tmp=/var/tmp/ryogoku/$(basename $(pwd))
+    # define unique name;
+    # get directory name from the parent to the three layer above and replace '/' wiht '-SLASH-'
+    local ryogoku_dir_name=$(pwd | grep -oe '[^/]*/[^/]*/[^/]*$' | sed 's;^/;;g' | sed 's;/;-SLASH-;g')
+    tmp=/var/tmp/ryogoku/${ryogoku_dir_name}
   fi
 
   if test $CURRENT -ne 1; then
