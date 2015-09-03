@@ -1,3 +1,7 @@
+## 1.0.0 / 2015-09-03
+
+  * Improve tmp directory name to be unique
+
 ## 0.7.0 / 2015-07-02
 
   * Add 'pre-deploy' directive
