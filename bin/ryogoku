@@ -4,7 +4,6 @@ VERSION="0.7.0"
 CONFIG=ryogoku.conf
 ENV=
 REF=
-TMP=
 ARG_PATH=
 EXCLUDE_FILE=rsync-exclude
 # -u (--update) is not good for rollback
