@@ -96,17 +96,17 @@ config_section() {
 }
 
 #
-# Get config value by <key>.
+# Get config value by <directive>.
 #
 config_get() {
   local nr_env=$(nl -b a $CONFIG | grep -m 1 "\[$ENV\]" | cut -f 1 | sed 's/ *//g')
   local nr_next_env=$(awk -v nr_env=$nr_env 'NR > nr_env && /^\[/ { print NR; exit }' $CONFIG)
   test -z "$nr_next_env" && nr_next_env='$'
 
-  local key=$1
-  test -n "$key" \
+  local directive=$1
+  test -n "$directive" \
     && sed -n "${nr_env}, ${nr_next_env}p" $CONFIG \
-    | grep "^$key" \
+    | grep "^$directive" \
     | head -n 1 \
     | cut -s -d ' ' -f 2-
 }
