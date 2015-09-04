@@ -62,10 +62,10 @@ $ ryogoku update
     -V, --version             output program versions
     -h, --help                output help information
     -n, --dry-run             show what would have been transferred
-    --discard                 delete destination path post deployment
     -p, --path <path>         specify path value
     -P <n>                    Set max number of parallel execution. default: 10
     --current                 use currnet directory as deployment source instead of cloned temporary directory
+    --delete-dest             delete destination path post deployment
 
   Commands:
 
