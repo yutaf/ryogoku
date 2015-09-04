@@ -254,7 +254,7 @@ EOF
 #
 envs() {
   set -o pipefail
-  grep '^\[[^]]*]$' $(git rev-parse --show-cdup)$CONFIG | sed 's/\[\([^]]*\)\]/\1/g'
+  grep '^\[[^]]*]$' $(git rev-parse --show-cdup)$CONFIG | sed 's/\[\([^]]*\)\]/\1/g' | sort
   exit $?
 }
 
