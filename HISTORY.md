@@ -1,3 +1,9 @@
+## 1.1.0 / 2015-09-04
+
+  * Enable specifying ssh key in config file
+  * Print usage when no arguments are passed
+  * Refactorings
+
 ## 1.0.0 / 2015-09-03
 
   * Improve tmp directory name to be unique
