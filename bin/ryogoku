@@ -505,6 +505,7 @@ check_for_local_changes() {
 }
 
 # parse argv
+test $# -eq 0 && { usage; exit 1; }
 
 while test $# -ne 0; do
   arg=$1; shift
