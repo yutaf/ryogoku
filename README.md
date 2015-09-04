@@ -59,25 +59,24 @@ $ ryogoku update
 
   Options:
 
-    -V, --version             output program versions
-    -h, --help                output help information
-    -n, --dry-run             show what would have been transferred
-    -p, --path <path>         specify path value
-    -P <n>                    Set max number of parallel execution. default: 10
-    --current                 use currnet directory as deployment source instead of cloned temporary directory
-    --delete-dest             delete destination path post deployment
+    -V, --version               output program versions
+    -h, --help                  output help information
+    -n, --dry-run               show what would have been transferred
+    -p, --path <path>           specify path value
+    -P <n>                      Set max number of parallel execution. default: 10
+    -c, --build-in-current-dir  build src in currnet directory, not in tmp cloned directory
+    -d, --delete-dest           delete destination path post deployment
 
   Commands:
 
-    init                      create config files
-    update                    update ryogoku to the latest release
-    envs                      list all env names
-
-    [ref]                     deploy indicated [ref]
-    revert [n]                revert to [n]th last deployment or 1
-    list                      list previous deploy commits
-    config_get <directive>    print specified config value
-    setup_remote_ssh <env>    Add remote env's public key to deployment host(s)'s authorized_keys
+    init                        create config files
+    update                      update ryogoku to the latest release
+    envs                        list all env names
+    list                        list previous deploy commits
+    [ref]                       deploy indicated [ref]
+    revert [n]                  revert to [n]th last deployment or 1
+    config_get <directive>      print specified config value
+    setup_remote_ssh <env>      Add remote env's public key to deployment host(s)'s authorized_keys
 ```
 
 ## License
