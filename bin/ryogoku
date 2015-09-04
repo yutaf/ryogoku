@@ -9,7 +9,7 @@ EXCLUDE_FILE=rsync-exclude
 # -u (--update) is not good for rollback
 RSYNC_OPTION="-rlpDvcK --delete --safe-links"
 DRYRUN=0
-CURRENT=0
+CREATE_RSYNC_SRC_IN_CURRENT_DIRECTORY=0
 DISCARD=0
 PARALLEL=10
 
@@ -284,13 +284,13 @@ deploy() {
   fi
   test $? -eq 0 || abort ssh failed
 
-  if test $CURRENT -ne 1 -a -n "$(config_get execute_in_current_dir)"; then
-    CURRENT=1
+  if test $CREATE_RSYNC_SRC_IN_CURRENT_DIRECTORY -ne 1 -a -n "$(config_get execute_in_current_dir)"; then
+    CREATE_RSYNC_SRC_IN_CURRENT_DIRECTORY=1
   fi
 
   # set tmp
   local tmp=
-  if test $CURRENT -eq 1; then
+  if test $CREATE_RSYNC_SRC_IN_CURRENT_DIRECTORY -eq 1; then
     tmp=.
   else
     # define unique name;
@@ -299,7 +299,7 @@ deploy() {
     tmp=/var/tmp/ryogoku/${ryogoku_dir_name}
   fi
 
-  if test $CURRENT -ne 1; then
+  if test $CREATE_RSYNC_SRC_IN_CURRENT_DIRECTORY -ne 1; then
     # create tmp
     test -d "$tmp" || mkdir -p $tmp
 
@@ -337,7 +337,7 @@ deploy() {
   ref=$(git rev-parse --short $ref_arg)
   test $? -eq 0 || abort invalid ref \`$ref_arg\`
 
-  if test $CURRENT -ne 1; then
+  if test $CREATE_RSYNC_SRC_IN_CURRENT_DIRECTORY -ne 1; then
     # reset HEAD
     log resetting HEAD to $ref
     (cd $tmp; git reset --hard $ref)
@@ -512,7 +512,7 @@ while test $# -ne 0; do
     -h|--help) usage; exit ;;
     -V|--version) version; exit ;;
     -n|--dry-run) DRYRUN=1 ;;
-    --current) CURRENT=1 ;;
+    --current) CREATE_RSYNC_SRC_IN_CURRENT_DIRECTORY=1 ;;
     --discard) DISCARD=1 ;;
     -p|--path) ARG_PATH=$1; shift ;;
     -P) PARALLEL=$1; shift ;;
