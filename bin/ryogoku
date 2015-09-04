@@ -538,7 +538,6 @@ done
 
 # move to repository root
 cd $(git rev-parse --show-toplevel)
-pwd
 
 require_env
 check_for_local_changes
