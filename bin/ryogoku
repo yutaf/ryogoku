@@ -146,6 +146,7 @@ ssh_command() {
 #
 ssh_command_single() {
   local url=$(get_ssh_list | head -n 1)
+  echo "ssh $(get_ssh_options) $url $@"
   ssh $(get_ssh_options) $url $@
 }
 
@@ -153,19 +154,17 @@ ssh_command_single() {
 # Get ssh options.
 #
 get_ssh_options(){
+  local key=$(config_get key)
   local forward_agent=$(config_get forward-agent)
   local port_num=$(config_get port)
   local needs_tty=$(config_get needs_tty)
 
-  local agent=
-  local port=
-  local tty=
-
   test -n "$forward_agent" && local agent="-A"
+  test -n "$key" && local identity="-i $key"
   test -n "$port_num" && local port="-p $port_num"
   test -n "$needs_tty" && local tty="-t"
 
-  echo $tty $agent $port
+  echo $tty $agent $port $identity
 }
 
 #
@@ -230,6 +229,8 @@ init() {
 [env]
 user 
 host 
+key 
+port 
 src 
 path 
 ref 
@@ -397,9 +398,18 @@ deploy() {
   fi
   src_dir=$(echo $src_dir | sed 's;[^/]$;&/;')
   test -d "$src_dir" || abort invalid src value: \"${src}\"
-  # rsync ssh port
+
+  # rsync ssh option
+  local key=$(config_get key)
+  test -n "$key" && local key_option="-i $key"
   local port=$(config_get port)
-  test -n "$port" && export RSYNC_RSH="ssh -p $port"
+  test -n "$port" && local port_option="-p $port"
+  if test -n "$key" -o -n "$key"; then
+    # -e option not working with xargs command
+#    rsync_ssh_option="-e \"ssh $key_option $port_option\""
+    # use RSYNC_RSH instad of -e option
+    export RSYNC_RSH="ssh $key_option $port_option"
+  fi
 
   # execute rsync
   log rsync
