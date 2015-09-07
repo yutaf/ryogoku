@@ -49,7 +49,6 @@ usage() {
     list                        list previous deploy commits
     [ref]                       deploy indicated [ref] source
     revert [n]                  revert to [n]th last deployment or 1
-    config_get <directive>      print specified config value
     setup_remote_ssh <env>      Add remote env's public key to deployment host(s)'s authorized_keys
 EOF
 }
@@ -221,7 +220,6 @@ update() {
 # Initialize
 #
 init() {
-  git rev-parse 2> /dev/null || abort not a git repository
   local config=$(git rev-parse --show-cdup)${CONFIG}
   test -e $config || {
     cat <<-EOF > $config
@@ -254,7 +252,7 @@ EOF
 #
 envs() {
   set -o pipefail
-  grep '^\[[^]]*]$' $(git rev-parse --show-cdup)$CONFIG | sed 's/\[\([^]]*\)\]/\1/g' | sort
+  grep '^\[[^]]*]$' $(git rev-parse --show-cdup)${CONFIG} | sed 's/\[\([^]]*\)\]/\1/g' | sort
   exit $?
 }
 
@@ -503,9 +501,15 @@ check_for_local_changes() {
   fi
 }
 
+#
+# Check cwd inside git repository
+#
+check_git_repository() {
+  git rev-parse 2> /dev/null || abort not a git repository
+}
+
 # parse argv
 test $# -eq 0 && { usage; exit 1; }
-
 while test $# -ne 0; do
   arg=$1; shift
   case $arg in
@@ -519,12 +523,9 @@ while test $# -ne 0; do
     revert) require_env; revert_to ${1:-1}; exit ;;
     list) require_env; list_deploys; exit ;;
     setup_remote_ssh) require_env; setup_remote_ssh $@; exit ;;
-    config_get) require_env; config_get $1; exit ;;
+    init) check_git_repository; init; exit ;;
+    envs) check_git_repository; envs; exit ;;
     update) update; exit ;;
-    init) init; exit ;;
-    envs) envs; exit ;;
-#    ssh_command) ssh_command $@; exit ;;
-#    ssh_command_single) ssh_command_single $@; exit ;;
     *)
       if test -z "$ENV"; then
         ENV=$arg
@@ -535,8 +536,10 @@ while test $# -ne 0; do
   esac
 done
 
+# check if cwd is inside a git repository
+check_git_repository
 # move to repository root
-cd $(git rev-parse --show-toplevel)
+cd $(git rev-parse --show-cdup)
 
 require_env
 check_for_local_changes
