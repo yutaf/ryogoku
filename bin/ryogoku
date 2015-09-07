@@ -453,7 +453,7 @@ deploy() {
 #
 # Add remote env's public key to deployment host(s)'s authorized_keys
 #
-setup_remote_ssh() {
+enable_ssh() {
   local env=$ENV
   local env_remote=$1
   test -z "$env_remote" && abort please pass the remote \<env\>
@@ -522,7 +522,7 @@ while test $# -ne 0; do
     -P) PARALLEL=$1; shift ;;
     revert) require_env; revert_to ${1:-1}; exit ;;
     list) require_env; list_deploys; exit ;;
-    setup_remote_ssh) require_env; setup_remote_ssh $@; exit ;;
+    enable_ssh) require_env; enable_ssh $@; exit ;;
     init) check_git_repository; init; exit ;;
     envs) check_git_repository; envs; exit ;;
     update) update; exit ;;
