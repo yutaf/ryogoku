@@ -4,7 +4,6 @@ VERSION="1.1.1"
 CONFIG=ryogoku.conf
 ENV=
 REF=
-ARG_PATH=
 EXCLUDE_FILE=rsync-exclude
 # -u (--update) is not good for rollback
 RSYNC_OPTION="-rlpDvcK --delete --safe-links"
@@ -36,7 +35,6 @@ usage() {
     -V, --version               output program versions
     -h, --help                  output help information
     -n, --dry-run               show what would have been transferred
-    -p, --path <path>           specify path value
     -P <n>                      Set max number of parallel execution. default: $PARALLEL
     -c, --build-in-current-dir  build src in currnet directory, not in tmp cloned directory
     -d, --delete-dest           delete destination path post deployment
@@ -170,11 +168,7 @@ get_ssh_options(){
 #
 nth_deploy_commit() {
   local n=$1
-  if test -n "$ARG_PATH"; then
-    local path=$ARG_PATH
-  else
-    local path=$(config_get path)
-  fi
+  local path=$(config_get path)
   ssh_command_single "nl $path/.deploys | sort -nr | awk -v n=$n 'NR==n { print \$2 }'"
 }
 
@@ -193,11 +187,7 @@ revert_to() {
 # List deploys.
 #
 list_deploys() {
-  if test -n "$ARG_PATH"; then
-    local path=$ARG_PATH
-  else
-    local path=$(config_get path)
-  fi
+  local path=$(config_get path)
   ssh_command_single "nl $path/.deploys | sort -nr | cut -f 2-"
 }
 
@@ -261,11 +251,7 @@ envs() {
 #
 deploy() {
   # path
-  if test -n "$ARG_PATH"; then
-    local path=$ARG_PATH
-  else
-    local path=$(config_get path)
-  fi
+  local path=$(config_get path)
 
   if test $DRYRUN -eq 1; then
     log DRYRUN MODE
@@ -518,7 +504,6 @@ while test $# -ne 0; do
     -n|--dry-run) DRYRUN=1 ;;
     -c|--build-in-current-dir) BUILD_IN_CURRENT_DIR=1 ;;
     -d|--delete-dest) DELETE_DEST=1 ;;
-    -p|--path) ARG_PATH=$1; shift ;;
     -P) PARALLEL=$1; shift ;;
     revert) require_env; revert_to ${1:-1}; exit ;;
     list) require_env; list_deploys; exit ;;
