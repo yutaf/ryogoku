@@ -8,9 +8,9 @@ Simple rsync deployment shell script
 
 ## Features
 
-- **Simple** ... minimal configurations and commands
-- **Easy to start** ... don't need any installations on remote
-- **Fast** ... preparing and building sources fast, and send them parallel
+- Rsync
+- Multi host deployment
+- Parallel execution
 
 ## Requirements
 
@@ -30,54 +30,35 @@ Set path to `/usr/local/bin` if you don't
 $ echo 'export PATH=/usr/local/bin:$PATH' >> ~/.bashrc
 ```
 
-## Update
+## Sample
 
-```
-$ ryogoku update
-```
+1. Create a config file
 
-## Blog
+  ```
+  [prod]
+  user rob
+  host 128.199.170.128 128.199.244.193
+  src build/
+  path /var/www/html
+  ref master
+  pre-rsync ./bin/pre-rsync
+  post-deploy /var/www/html/bin/update.sh && /var/www/html/bin/update.prod.sh
+  umask 002
+  ```
 
-<http://yutaf.github.io/i-made-a-deployment-tool-ryogoku/>
+2. Deploy
+
+  ```
+  $ ryogoku prod
+  ```
 
 ## Getting Started
 
 <https://github.com/yutaf/ryogoku/wiki/Getting-Started>
 
-## How it works
+## Blog
 
-![How it works](/images/ryogoku-01.png)
-
-## Usage
-
-```
-  Usage: ryogoku [options] <env> [command]
-
-  * default rsync option is "-rlpDvcK --delete --safe-links"
-  * default rsync's "--exclude-from=" path is REPOSITORY-ROOT/rsync-exclude
-  * config file path is REPOSITORY-ROOT/ryogoku.conf
-
-  Options:
-
-    -V, --version               output program versions
-    -h, --help                  output help information
-    -n, --dry-run               show what would have been transferred
-    -p, --path <path>           specify path value
-    -P <n>                      Set max number of parallel execution. default: 10
-    -c, --build-in-current-dir  build src in currnet directory, not in tmp cloned directory
-    -d, --delete-dest           delete destination path post deployment
-
-  Commands:
-
-    init                        create config files
-    update                      update ryogoku to the latest release
-    envs                        list all env names
-    list                        list previous deploy commits
-    [ref]                       deploy indicated [ref]
-    revert [n]                  revert to [n]th last deployment or 1
-    config_get <directive>      print specified config value
-    setup_remote_ssh <env>      Add remote env's public key to deployment host(s)'s authorized_keys
-```
+<http://yutaf.github.io/i-made-a-deployment-tool-ryogoku/>
 
 ## License
 
