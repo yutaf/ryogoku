@@ -27,9 +27,9 @@ usage() {
   cat <<-EOF
   Usage: ryogoku [options] <env> [command]
 
+  * config file path is REPOSITORY-ROOT/${CONFIG}
   * default rsync option is "$RSYNC_OPTION"
   * default rsync's "--exclude-from=" path is REPOSITORY-ROOT/${EXCLUDE_FILE}
-  * config file path is REPOSITORY-ROOT/${CONFIG}
 
   Options:
 
@@ -47,7 +47,7 @@ usage() {
     update                      update ryogoku to the latest release
     envs                        list all env names
     list                        list previous deploy commits
-    [ref]                       deploy indicated [ref]
+    [ref]                       deploy indicated [ref] source
     revert [n]                  revert to [n]th last deployment or 1
     config_get <directive>      print specified config value
     setup_remote_ssh <env>      Add remote env's public key to deployment host(s)'s authorized_keys
