@@ -43,13 +43,13 @@ usage() {
 
   Commands:
 
+    <env> list                  list previous deploy commits
+    <env> [ref]                 deploy indicated [ref] source tp <env>
+    <env> revert [n]            revert to [n]th last deployment or 1
+    <env> enable_ssh <env2>     enable <env2> ssh to <env>
+    envs                        list all env names
     init                        create config files
     update                      update ryogoku to the latest release
-    envs                        list all env names
-    list                        list previous deploy commits
-    [ref]                       deploy indicated [ref] source
-    revert [n]                  revert to [n]th last deployment or 1
-    setup_remote_ssh <env>      Add remote env's public key to deployment host(s)'s authorized_keys
 EOF
 }
 
