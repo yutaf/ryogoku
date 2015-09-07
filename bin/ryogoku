@@ -46,7 +46,6 @@ usage() {
     <env> list                  list previous deploy commits
     <env> [ref]                 deploy indicated [ref] source tp <env>
     <env> revert [n]            revert to [n]th last deployment or 1
-    <env> config_get <directive>      print specified config value
     <env> enable_ssh <env2>     enable <env2> ssh to <env>
     envs                        list all env names
     init                        create config files
@@ -524,7 +523,6 @@ while test $# -ne 0; do
     revert) require_env; revert_to ${1:-1}; exit ;;
     list) require_env; list_deploys; exit ;;
     enable_ssh) require_env; enable_ssh $@; exit ;;
-    config_get) require_env; config_get $1; exit ;;
     init) check_git_repository; init; exit ;;
     envs) check_git_repository; envs; exit ;;
     update) update; exit ;;
