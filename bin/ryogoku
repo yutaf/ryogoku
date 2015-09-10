@@ -524,7 +524,7 @@ done
 # check if cwd is inside a git repository
 check_git_repository
 # move to repository root
-cd $(git rev-parse --show-cdup)
+cd $(git rev-parse --show-toplevel)
 
 require_env
 check_for_local_changes
