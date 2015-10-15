@@ -274,7 +274,7 @@ deploy() {
   local tmp=
   if test $BUILD_IN_CURRENT_DIR -eq 1; then
     tmp=$(pwd)
-    log ryogoku working directory: $tmp
+    log working directory: $tmp
   else
     # define unique name;
     # get directory name from the parent to the three layer above and replace '/' wiht '-SLASH-'
