@@ -274,7 +274,8 @@ deploy() {
   # set tmp
   local tmp=
   if test $BUILD_IN_CURRENT_DIR -eq 1; then
-    tmp=.
+    tmp=$(pwd)
+    log ryogoku working directory: $tmp
   else
     # define unique name;
     # get directory name from the parent to the three layer above and replace '/' wiht '-SLASH-'
@@ -284,7 +285,8 @@ deploy() {
 
   if test $BUILD_IN_CURRENT_DIR -ne 1; then
     # create tmp
-    test -d "$tmp" || mkdir -p $tmp
+    test -d "$tmp" || { mkdir -p $tmp; log create $tmp; }
+    log ryogoku working directory: $tmp
 
     # export
     local umask_value=$(config_get umask)
