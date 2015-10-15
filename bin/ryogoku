@@ -142,7 +142,6 @@ ssh_command() {
 #
 ssh_command_single() {
   local url=$(get_ssh_list | head -n 1)
-  echo "ssh $(get_ssh_options) $url $@"
   ssh $(get_ssh_options) $url $@
 }
 
