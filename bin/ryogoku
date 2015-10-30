@@ -36,7 +36,8 @@ usage() {
     -h, --help                  output help information
     -n, --dry-run               show what would have been transferred
     -P <n>                      Set max number of parallel execution. default: $PARALLEL
-    -c, --build-in-current-dir  build src in currnet directory, not in tmp cloned directory
+    -c, --build-in-current-dir  CAUTION: This brings destructive changes to current repository
+                                Build src in currnet directory instead of tmp cloned directory
     -d, --delete-dest           delete destination path post deployment
 
   Commands:
