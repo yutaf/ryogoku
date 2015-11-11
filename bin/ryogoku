@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.1.1"
+VERSION="1.1.2"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -32,23 +32,24 @@ usage() {
 
   Options:
 
-    -V, --version               output program versions
-    -h, --help                  output help information
-    -n, --dry-run               show what would have been transferred
-    -P <n>                      Set max number of parallel execution. default: $PARALLEL
-    -c, --build-in-current-dir  CAUTION: This brings destructive changes to current repository
-                                Build src in currnet directory instead of tmp cloned directory
-    -d, --delete-dest           delete destination path post deployment
+    -V, --version                 output program versions
+    -h, --help                    output help information
+    -n, --dry-run                 show what would have been transferred
+    -P <n>                        Set max number of parallel execution. default: $PARALLEL
+    -c, --build-in-current-dir    CAUTION: This brings destructive changes to current repository
+                                  Build src in currnet directory instead of tmp cloned directory
+    -d, --delete-dest             delete destination path post deployment
 
   Commands:
 
-    <env> list                  list previous deploy commits
-    <env> [ref]                 deploy indicated [ref] source tp <env>
-    <env> revert [n]            revert to [n]th last deployment or 1
-    <env> enable_ssh <env2>     enable <env2> ssh to <env>
-    envs                        list all env names
-    init                        create config files
-    update                      update ryogoku to the latest release
+    <env> [ref]                   deploy indicated [ref] source tp <env>
+    <env> config_get [directive]  get speified config value
+    <env> list                    list previous deploy commits
+    <env> revert [n]              revert to [n]th last deployment or 1
+    <env> enable_ssh <env2>       enable <env2> ssh to <env>
+    envs                          list all env names
+    init                          create config files
+    update                        update ryogoku to the latest release
 EOF
 }
 
@@ -507,11 +508,12 @@ while test $# -ne 0; do
     -c|--build-in-current-dir) BUILD_IN_CURRENT_DIR=1 ;;
     -d|--delete-dest) DELETE_DEST=1 ;;
     -P) PARALLEL=$1; shift ;;
+    config_get) require_env; config_get $@; exit ;;
     enable_ssh) require_env; enable_ssh $@; exit ;;
-    envs) check_git_repository; envs; exit ;;
-    init) check_git_repository; init; exit ;;
     list) require_env; list_deploys; exit ;;
     revert) require_env; revert_to ${1:-1}; exit ;;
+    envs) check_git_repository; envs; exit ;;
+    init) check_git_repository; init; exit ;;
     update) update; exit ;;
     *)
       if test -z "$ENV"; then
