@@ -1,3 +1,7 @@
+## 1.1.2 / 2015-11-11
+
+  * Add 'config_get' command
+
 ## 1.1.1 / 2015-09-04
 
   * Fix option names
