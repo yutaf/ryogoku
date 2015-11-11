@@ -507,11 +507,11 @@ while test $# -ne 0; do
     -c|--build-in-current-dir) BUILD_IN_CURRENT_DIR=1 ;;
     -d|--delete-dest) DELETE_DEST=1 ;;
     -P) PARALLEL=$1; shift ;;
-    revert) require_env; revert_to ${1:-1}; exit ;;
-    list) require_env; list_deploys; exit ;;
     enable_ssh) require_env; enable_ssh $@; exit ;;
-    init) check_git_repository; init; exit ;;
     envs) check_git_repository; envs; exit ;;
+    init) check_git_repository; init; exit ;;
+    list) require_env; list_deploys; exit ;;
+    revert) require_env; revert_to ${1:-1}; exit ;;
     update) update; exit ;;
     *)
       if test -z "$ENV"; then
