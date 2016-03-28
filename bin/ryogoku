@@ -268,11 +268,9 @@ deploy() {
     for host in $ssh_list; do
       local cmd_ssh="ssh $(get_ssh_options) ${host} :"
       echo $cmd_ssh
-      echo
       eval $cmd_ssh
 
       test $? -eq 0 || abort [$ENV] failed to ssh to $host
-      echo
     done
   fi
   test $? -eq 0 || abort ssh failed
