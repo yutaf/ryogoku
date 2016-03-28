@@ -264,7 +264,16 @@ deploy() {
   if test $DRYRUN -eq 1; then
     ssh_command_single :
   else
-    get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % :
+    local ssh_list=$(get_ssh_list)
+    for host in $ssh_list; do
+      local cmd_ssh="ssh $(get_ssh_options) ${host} :"
+      echo $cmd_ssh
+      echo
+      eval $cmd_ssh
+
+      test $? -eq 0 || abort [$ENV] failed to ssh to $host
+      echo
+    done
   fi
   test $? -eq 0 || abort ssh failed
 
