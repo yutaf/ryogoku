@@ -1,3 +1,7 @@
+## 1.1.3 / 2015-11-11
+
+  * Fix ssh connection hang
+
 ## 1.1.2 / 2015-11-11
 
   * Add 'config_get' command
