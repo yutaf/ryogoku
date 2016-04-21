@@ -466,10 +466,15 @@ enable_ssh() {
 #  ssh_command_single "grep 'StrictHostKeyChecking no' \$HOME/.ssh/config >/dev/null 2>&1 || { echo 'StrictHostKeyChecking no' >> \$HOME/.ssh/config; chmod 600 \$HOME/.ssh/config; }"
 
   ENV=$env
-  get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % "grep '$remote_public_key' \$HOME/.ssh/authorized_keys >/dev/null 2>&1 || echo $remote_public_key >> \$HOME/.ssh/authorized_keys"
-  test $? -eq 0 || abort failed to add webhook public key to authorized_keys
-
+  # stop parallel execution because ssh connection yes/no check fails
   local ssh_list=$(get_ssh_list)
+  for host in $ssh_list; do
+    local cmd_ssh="ssh $(get_ssh_options) ${host} grep '$remote_public_key' \$HOME/.ssh/authorized_keys >/dev/null 2>&1 || echo $remote_public_key >> \$HOME/.ssh/authorized_keys"
+    echo $cmd_ssh
+    eval $cmd_ssh
+    test $? -eq 0 || abort "failed to add webhook public key to authorized_keys"
+  done
+
   ENV=$env_remote
   for host in $ssh_list; do
     ssh_command_single "ssh $host echo && echo Connected to $host"
