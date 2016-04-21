@@ -1,9 +1,9 @@
-## 1.1.4 / 2015-11-11
+## 1.1.4 / 2015-04-21
 
   * Stop parallel execution in enable_ssh command
   * Create path in pre_deploy hook if it does not exist
 
-## 1.1.3 / 2015-11-11
+## 1.1.3 / 2016-03-28
 
   * Fix ssh connection hang
 
