@@ -356,7 +356,6 @@ deploy() {
       log "executing pre-deploy \`$cmd_pre_deploy\`"
 
       local cmd_pre_deploy_exe=
-
       for str in $cmd_pre_deploy; do
         local cmd=$str
         test -x "$str" && cmd="$(cat $str)"
