@@ -362,7 +362,12 @@ deploy() {
         cmd_pre_deploy_exe=${cmd_pre_deploy_exe}" "${cmd}
       done
 
-      get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % "cd $path && eval \"$cmd_pre_deploy_exe\""
+      get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % "{
+      if ! test -d $path; then
+        mkdir -p $path
+      fi
+      cd $path && eval \"$cmd_pre_deploy_exe\"
+    }"
       test $? -eq 0 || abort pre-deploy failed
     fi
   fi
