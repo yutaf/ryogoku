@@ -1,4 +1,8 @@
-## 1.1.4 / 2015-04-21
+## 1.1.5 / 2016-05-12
+
+  * Escape double quotes in deploy log
+
+## 1.1.4 / 2016-04-21
 
   * Stop parallel execution in enable_ssh command
   * Create path in pre_deploy hook if it does not exist
