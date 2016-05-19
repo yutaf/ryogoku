@@ -1,3 +1,8 @@
+## 1.1.6 / 2016-05-19
+
+  * Rename 'enable_ssh' -> 'allow_ssh'
+  * Fix enable_ssh(allow_ssh) command
+
 ## 1.1.5 / 2016-05-12
 
   * Escape double quotes in deploy log
