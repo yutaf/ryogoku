@@ -46,7 +46,7 @@ usage() {
     <env> config_get [directive]  get speified config value
     <env> list                    list previous deploy commits
     <env> revert [n]              revert to [n]th last deployment or 1
-    <env> enable_ssh <env2>       enable <env2> ssh to <env>
+    <env> allow_ssh <env2>        enable <env2> ssh to <env>
     envs                          list all env names
     init                          create config files
     update                        update ryogoku to the latest release
@@ -456,7 +456,7 @@ deploy() {
 #
 # Add remote env's public key to deployment host(s)'s authorized_keys
 #
-enable_ssh() {
+allow_ssh() {
   local env=$ENV
   local env_remote=$1
   test -z "$env_remote" && abort please pass the remote \<env\>
@@ -528,7 +528,7 @@ while test $# -ne 0; do
     -d|--delete-dest) DELETE_DEST=1 ;;
     -P) PARALLEL=$1; shift ;;
     config_get) require_env; config_get $@; exit ;;
-    enable_ssh) require_env; enable_ssh $@; exit ;;
+    allow_ssh) require_env; allow_ssh $@; exit ;;
     list) require_env; list_deploys; exit ;;
     revert) require_env; revert_to ${1:-1}; exit ;;
     envs) check_git_repository; envs; exit ;;
