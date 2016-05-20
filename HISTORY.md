@@ -1,3 +1,7 @@
+## 1.1.7 / 2016-05-20
+
+  * Add 'info' subcommand
+
 ## 1.1.6 / 2016-05-19
 
   * Rename 'enable_ssh' -> 'allow_ssh'
