@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.1.6"
+VERSION="1.1.7"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -45,6 +45,7 @@ usage() {
     <env> [ref]                   deploy indicated [ref] source tp <env>
     <env> list                    list previous deploy commits
     <env> revert [n]              revert to [n]th last deployment or 1
+    <env> info                    Show setting of speified env
     <env> allow_ssh <env2>        enable <env2> ssh to <env>
     envs                          list all env names
     init                          create config files
@@ -106,6 +107,21 @@ config_get() {
     | grep "^$directive" \
     | head -n 1 \
     | cut -s -d ' ' -f 2-
+}
+
+#
+# Show setting of speified env
+#
+info() {
+  local nr_env=$(nl -b a $CONFIG | grep -m 1 "\[$ENV\]" | cut -f 1 | sed 's/ *//g')
+  local nr_next_env=$(awk -v nr_env=$nr_env 'NR > nr_env && /^\[/ { print NR; exit }' $CONFIG)
+  if test -n "$nr_next_env"; then
+    nr_next_env=$(expr ${nr_next_env} - 1)
+  else
+    nr_next_env='$'
+  fi
+
+  sed -n "${nr_env}, ${nr_next_env}p" $CONFIG
 }
 
 #
@@ -527,10 +543,11 @@ while test $# -ne 0; do
     -d|--delete-dest) DELETE_DEST=1 ;;
     -P) PARALLEL=$1; shift ;;
     allow_ssh) require_env; allow_ssh $@; exit ;;
+    envs) check_git_repository; envs; exit ;;
+    info) require_env; info; exit ;;
+    init) check_git_repository; init; exit ;;
     list) require_env; list_deploys; exit ;;
     revert) require_env; revert_to ${1:-1}; exit ;;
-    envs) check_git_repository; envs; exit ;;
-    init) check_git_repository; init; exit ;;
     update) update; exit ;;
     *)
       if test -z "$ENV"; then
