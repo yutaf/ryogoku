@@ -1,6 +1,6 @@
 # ryogoku
 
-Simple rsync deployment shell script
+Rsync deployment tool
 
 ## Forked from
 
