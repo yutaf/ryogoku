@@ -258,6 +258,7 @@ EOF
 # List all env names.
 #
 envs() {
+  test -f "$(git rev-parse --show-cdup)${CONFIG}" || abort "config file is not found"
   set -o pipefail
   grep '^\[[^]]*]$' $(git rev-parse --show-cdup)${CONFIG} | sed 's/\[\([^]]*\)\]/\1/g' | sort
   exit $?
@@ -545,7 +546,7 @@ while test $# -ne 0; do
     -P) PARALLEL=$1; shift ;;
     allow_ssh) require_env; allow_ssh $@; exit ;;
     config_get) require_env; config_get $@; exit ;;
-    envs) check_git_repository; envs; exit ;;
+    envs) envs; exit ;;
     info) require_env; info; exit ;;
     init) check_git_repository; init; exit ;;
     list) require_env; list_deploys; exit ;;
