@@ -258,7 +258,6 @@ EOF
 # List all env names.
 #
 envs() {
-  test -f "$(git rev-parse --show-cdup)${CONFIG}" || abort "config file is not found"
   set -o pipefail
   grep '^\[[^]]*]$' $(git rev-parse --show-cdup)${CONFIG} | sed 's/\[\([^]]*\)\]/\1/g' | sort
   exit $?
@@ -511,6 +510,13 @@ allow_ssh() {
 # Require environment arg.
 #
 require_env() {
+  # check if cwd is inside a git repository
+  check_git_repository
+  # check config file existence
+  check_config_file_existence
+  # move to repository root
+  cd $(git rev-parse --show-toplevel)
+
   config_section $ENV || { cecho $RED "[$ENV] config section not defined" 1>&2; exit $EXIT_STATUS_CONFIG_SECTION_NOT_DEFINED; }
   test -z "$ENV" && abort "<env> required"
 }
@@ -533,6 +539,13 @@ check_git_repository() {
   git rev-parse 2> /dev/null || abort not a git repository
 }
 
+#
+# Check config file existence
+#
+check_config_file_existence() {
+  test -f "$(git rev-parse --show-cdup)${CONFIG}" || abort "config file is not found"
+}
+
 # parse argv
 test $# -eq 0 && { usage; exit 1; }
 while test $# -ne 0; do
@@ -546,11 +559,11 @@ while test $# -ne 0; do
     -P) PARALLEL=$1; shift ;;
     allow_ssh) require_env; allow_ssh $@; exit ;;
     config_get) require_env; config_get $@; exit ;;
-    envs) envs; exit ;;
     info) require_env; info; exit ;;
-    init) check_git_repository; init; exit ;;
     list) require_env; list_deploys; exit ;;
     revert) require_env; revert_to ${1:-1}; exit ;;
+    envs) check_config_file_existence; envs; exit ;;
+    init) check_git_repository; init; exit ;;
     update) update; exit ;;
     *)
       if test -z "$ENV"; then
@@ -561,11 +574,6 @@ while test $# -ne 0; do
       ;;
   esac
 done
-
-# check if cwd is inside a git repository
-check_git_repository
-# move to repository root
-cd $(git rev-parse --show-toplevel)
 
 require_env
 check_for_local_changes
