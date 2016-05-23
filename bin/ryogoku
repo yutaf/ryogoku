@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.1.7"
+VERSION="1.2.0"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -11,6 +11,9 @@ DRYRUN=0
 BUILD_IN_CURRENT_DIR=0
 DELETE_DEST=0
 PARALLEL=10
+PRE_DEPLOY=
+PRE_RSYNC=
+POST_DEPLOY=
 
 EXIT_STATUS_CONFIG_SECTION_NOT_DEFINED=91
 
@@ -35,10 +38,13 @@ usage() {
     -V, --version                 output program versions
     -h, --help                    output help information
     -n, --dry-run                 show what would have been transferred
-    -P <n>                        Set max number of parallel execution. default: $PARALLEL
     -c, --build-in-current-dir    CAUTION: This brings destructive changes to the repository
                                   Build src in the currnet directory instead of temporary cloned directory
     -d, --delete-dest             delete destination path post deployment
+    --pre-deploy                  Set 'pre-deploy' with config value ignored
+    --pre-rsync                   Set 'pre-rsync' with config value ignored
+    --post-deploy                 Set 'post-deploy' with config value ignored
+    -P <n>                        Set max number of parallel execution. default: $PARALLEL
 
   Commands:
 
@@ -359,6 +365,7 @@ deploy() {
 
   # pre-rsync
   local cmd_pre_rsync=$(config_get pre-rsync)
+  test -n "$PRE_RSYNC" && cmd_pre_rsync=$PRE_RSYNC
   if test -n "$cmd_pre_rsync"; then
     log "executing pre-rsync \`$cmd_pre_rsync\`"
     (cd $tmp; eval $cmd_pre_rsync)
@@ -368,6 +375,7 @@ deploy() {
   # pre-deploy
   if test $DRYRUN -ne 1; then
     local cmd_pre_deploy=$(config_get pre-deploy)
+    test -n "$PRE_DEPLOY" && cmd_pre_deploy=$PRE_DEPLOY
     if test -n "$cmd_pre_deploy"; then
       log "executing pre-deploy \`$cmd_pre_deploy\`"
 
@@ -458,6 +466,7 @@ deploy() {
   test $? -eq 0 || warn deploy log append failed
 
   local cmd_post_deploy=$(config_get post-deploy)
+  test -n "$POST_DEPLOY" && cmd_post_deploy=$POST_DEPLOY
   if test -n "$cmd_post_deploy"; then
     log "executing post-deploy \`$cmd_post_deploy\`"
     get_ssh_list | xargs -t -n $PARALLEL -P $PARALLEL -I % ssh $(get_ssh_options) % "cd $path && eval $cmd_post_deploy"
@@ -557,6 +566,9 @@ while test $# -ne 0; do
     -c|--build-in-current-dir) BUILD_IN_CURRENT_DIR=1 ;;
     -d|--delete-dest) DELETE_DEST=1 ;;
     -P) PARALLEL=$1; shift ;;
+    --pre-deploy) PRE_DEPLOY=$1; shift ;;
+    --pre-rsync) PRE_RSYNC=$1; shift ;;
+    --post-deploy) POST_DEPLOY=$1; shift ;;
     allow_ssh) require_env; allow_ssh $@; exit ;;
     config_get) require_env; config_get $@; exit ;;
     info) require_env; info; exit ;;
