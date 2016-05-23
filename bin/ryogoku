@@ -43,6 +43,7 @@ usage() {
   Commands:
 
     <env> [ref]                   deploy indicated [ref] source tp <env>
+    <env> config_get [directive]  get speified config value
     <env> list                    list previous deploy commits
     <env> revert [n]              revert to [n]th last deployment or 1
     <env> info                    Show setting of speified env
@@ -542,6 +543,7 @@ while test $# -ne 0; do
     -c|--build-in-current-dir) BUILD_IN_CURRENT_DIR=1 ;;
     -d|--delete-dest) DELETE_DEST=1 ;;
     -P) PARALLEL=$1; shift ;;
+    config_get) require_env; config_get $@; exit ;;
     allow_ssh) require_env; allow_ssh $@; exit ;;
     envs) check_git_repository; envs; exit ;;
     info) require_env; info; exit ;;
