@@ -1,3 +1,9 @@
+## 1.2.0 / 2016-05-24
+
+  * Add --pre-deploy, --pre-rsync, --post-deploy to cli options
+  * Remove --build-in-current-dir option
+  * Fix setting check
+
 ## 1.1.7 / 2016-05-20
 
   * Add 'info' subcommand
