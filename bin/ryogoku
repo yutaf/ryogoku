@@ -38,9 +38,9 @@ usage() {
     -h, --help                    output help information
     -n, --dry-run                 show what would have been transferred
     -d, --delete-dest             delete destination path post deployment
-    --pre-deploy                  Set 'pre-deploy' with config value ignored
-    --pre-rsync                   Set 'pre-rsync' with config value ignored
-    --post-deploy                 Set 'post-deploy' with config value ignored
+    --pre-deploy                  Specify 'pre-deploy'; config value is overridden
+    --pre-rsync                   Specify 'pre-rsync'; config value is overridden
+    --post-deploy                 Specify 'post-deploy'; config value is overridden
     -P <n>                        Set max number of parallel execution. default: $PARALLEL
 
   Commands:
