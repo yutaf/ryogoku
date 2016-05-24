@@ -37,8 +37,6 @@ usage() {
     -V, --version                 output program versions
     -h, --help                    output help information
     -n, --dry-run                 show what would have been transferred
-    -c, --build-in-current-dir    CAUTION: This brings destructive changes to the repository
-                                  Build src in the currnet directory instead of temporary cloned directory
     -d, --delete-dest             delete destination path post deployment
     --pre-deploy                  Set 'pre-deploy' with config value ignored
     --pre-rsync                   Set 'pre-rsync' with config value ignored
