@@ -216,13 +216,12 @@ list_deploys() {
 #
 update() {
   log "updating ryogoku(1)"
+  local file=$(cd $(dirname $0) && pwd)/$(basename $0)
   local tmp=$(mktemp -u 2>/dev/null || mktemp -u -t $$ 2>/dev/null || echo /var/tmp/$$)
-  git clone git://github.com/yutaf/ryogoku.git \
-    --depth 1 \
-    $tmp \
-  && cd $tmp \
-  && make install \
-  && log "updated $VERSION -> `./bin/ryogoku --version`"
+  git clone git://github.com/yutaf/ryogoku.git --depth 1 $tmp
+  cd $tmp
+  cat ./bin/ryogoku > $file \
+  && log "updated ${VERSION} -> $(./bin/ryogoku --version)"
   rm -rf $tmp
 }
 
