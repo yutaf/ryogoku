@@ -1,3 +1,7 @@
+## 1.2.1 / 2016-05-25
+
+  * Override executed ryogoku file itself when it is updated
+
 ## 1.2.0 / 2016-05-24
 
   * Add --pre-deploy, --pre-rsync, --post-deploy to cli options
