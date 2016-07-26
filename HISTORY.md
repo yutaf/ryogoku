@@ -1,3 +1,7 @@
+## 1.2.2 / 2016-07-26
+
+  * Fix port setting bug
+
 ## 1.2.1 / 2016-05-25
 
   * Override executed ryogoku file itself when it is updated
