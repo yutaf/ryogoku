@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION="1.2.1"
+VERSION="1.2.2"
 CONFIG=ryogoku.conf
 ENV=
 REF=
@@ -408,7 +408,7 @@ deploy() {
   test -n "$key" && local key_option="-i $key"
   local port=$(config_get port)
   test -n "$port" && local port_option="-p $port"
-  if test -n "$key" -o -n "$key"; then
+  if test -n "$key" -o -n "$port"; then
     # -e option not working with xargs command
 #    rsync_ssh_option="-e \"ssh $key_option $port_option\""
     # use RSYNC_RSH instad of -e option
