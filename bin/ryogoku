@@ -9,6 +9,7 @@ EXCLUDE_FILE=rsync-exclude
 RSYNC_OPTION="-rlpDvcK --delete --safe-links"
 DRYRUN=0
 DELETE_DEST=0
+NO_GIT=0
 PARALLEL=10
 PRE_DEPLOY=
 PRE_RSYNC=
@@ -41,6 +42,7 @@ usage() {
     --pre-deploy                  Specify 'pre-deploy'; config value is overridden
     --pre-rsync                   Specify 'pre-rsync'; config value is overridden
     --post-deploy                 Specify 'post-deploy'; config value is overridden
+    --no-git                      Deploy from existing source instead of creating temporary git repo for this tool
     -P <n>                        Set max number of parallel execution. default: $PARALLEL
 
   Commands:
@@ -294,57 +296,60 @@ deploy() {
   test $? -eq 0 || abort ssh failed
 
   # set tmp
-  local tmp=
-  # define unique tmp name;
-  # get directory name from the parent to the three layer above and replace '/' wiht '-SLASH-'
-  local ryogoku_dir_name=$(pwd | grep -oe '[^/]*/[^/]*/[^/]*$' | sed 's;^/;;g' | sed 's;/;-SLASH-;g')
-  tmp=/var/tmp/ryogoku/${ryogoku_dir_name}
+  if test $NO_GIT -eq 1; then
+    tmp=$(pwd)
+  else
+    # define unique tmp name;
+    # get directory name from the parent to the three layer above and replace '/' wiht '-SLASH-'
+    local ryogoku_dir_name=$(pwd | grep -oe '[^/]*/[^/]*/[^/]*$' | sed 's;^/;;g' | sed 's;/;-SLASH-;g')
+    tmp=/var/tmp/ryogoku/${ryogoku_dir_name}
 
-  # create tmp
-  test -d "$tmp" || { mkdir -p $tmp; log create $tmp; }
-  log working directory: $tmp
+    # create tmp
+    test -d "$tmp" || { mkdir -p $tmp; log create $tmp; }
+    log working directory: $tmp
 
-  # export
-  local umask_value=$(config_get umask)
-  test -n "$umask_value" && umask $umask_value
-  local repository=$(pwd)
-  (cd $tmp; git rev-parse 2> /dev/null)
-  if test $? -ne 0; then
-    (cd $tmp; git clone $repository .) || abort failed to clone
+    # export
+    local umask_value=$(config_get umask)
+    test -n "$umask_value" && umask $umask_value
+    local repository=$(pwd)
+    (cd $tmp; git rev-parse 2> /dev/null)
+    if test $? -ne 0; then
+      (cd $tmp; git clone $repository .) || abort failed to clone
+    fi
+
+    # check remote url
+    local remote_url=$(cd $tmp > /dev/null 2>&1 && git remote -v | grep -m 1 ^origin | cut -f 2 | cut -d ' ' -f 1)
+    if test "$repository" != "$remote_url"; then
+      log clone directory path changed. clone again from the new path.
+      rm -rf $tmp
+      mkdir -p $tmp
+      (cd $tmp; git clone $repository .) || abort failed to clone
+    fi
+
+    # fetch source
+    log fetching updates
+    (cd $tmp; git fetch --all --prune)
+    test $? -eq 0 || abort fetch failed
+
+    # set ref
+    local ref_arg=$1
+    if test -z "$ref_arg"; then
+      # fetch branch name
+      ref_arg=$(git rev-parse --abbrev-ref HEAD)
+    fi
+
+    ref=$(git rev-parse --short $ref_arg)
+    test $? -eq 0 || abort invalid ref \`$ref_arg\`
+
+    # reset HEAD
+    log resetting HEAD to $ref
+    (cd $tmp; git reset --hard $ref)
+    test $? -eq 0 || abort git reset failed
+
+    # clean
+    log clean
+    (cd $tmp; git clean -d -f)
   fi
-
-  # check remote url
-  local remote_url=$(cd $tmp > /dev/null 2>&1 && git remote -v | grep -m 1 ^origin | cut -f 2 | cut -d ' ' -f 1)
-  if test "$repository" != "$remote_url"; then
-    log clone directory path changed. clone again from the new path.
-    rm -rf $tmp
-    mkdir -p $tmp
-    (cd $tmp; git clone $repository .) || abort failed to clone
-  fi
-
-  # fetch source
-  log fetching updates
-  (cd $tmp; git fetch --all --prune)
-  test $? -eq 0 || abort fetch failed
-
-  # set ref
-  local ref_arg=$1
-  if test -z "$ref_arg"; then
-    # fetch branch name
-    ref_arg=$(git rev-parse --abbrev-ref HEAD)
-  fi
-
-  ref=$(git rev-parse --short $ref_arg)
-  test $? -eq 0 || abort invalid ref \`$ref_arg\`
-
-  # reset HEAD
-  log resetting HEAD to $ref
-  (cd $tmp; git reset --hard $ref)
-  test $? -eq 0 || abort git reset failed
-
-  # clean
-  log clean
-  (cd $tmp; git clean -d -f)
 
   # pre-rsync
   local cmd_pre_rsync=$(config_get pre-rsync)
@@ -551,6 +556,7 @@ while test $# -ne 0; do
     --pre-deploy) PRE_DEPLOY=$1; shift ;;
     --pre-rsync) PRE_RSYNC=$1; shift ;;
     --post-deploy) POST_DEPLOY=$1; shift ;;
+    --no-git) NO_GIT=1 ;;
     allow_ssh) require_env; allow_ssh $@; exit ;;
     config_get) require_env; config_get $@; exit ;;
     info) require_env; info; exit ;;
@@ -570,7 +576,7 @@ while test $# -ne 0; do
 done
 
 require_env
-check_for_local_changes
+test $NO_GIT -eq 1 || check_for_local_changes
 
 # deploy
 deploy "${REF:-$(config_get ref)}"
