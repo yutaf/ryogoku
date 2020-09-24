@@ -1,3 +1,7 @@
+## 1.2.3 / 2020-09-24
+
+  * Add --no-git option
+
 ## 1.2.2 / 2016-07-26
 
   * Fix port setting bug
