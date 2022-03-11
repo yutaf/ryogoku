@@ -296,6 +296,7 @@ deploy() {
   test $? -eq 0 || abort ssh failed
 
   # set tmp
+  local tmp=
   if test $NO_GIT -eq 1; then
     tmp=$(pwd)
   else
