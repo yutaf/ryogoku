@@ -42,7 +42,7 @@ usage() {
     --pre-deploy                  Specify 'pre-deploy'; config value is overridden
     --pre-rsync                   Specify 'pre-rsync'; config value is overridden
     --post-deploy                 Specify 'post-deploy'; config value is overridden
-    --no-git                      Deploy from existing source instead of creating temporary git repo for this tool
+    --no-git                      Deploy current codes regardless of git commit
     -P <n>                        Set max number of parallel execution. default: $PARALLEL
 
   Commands:
